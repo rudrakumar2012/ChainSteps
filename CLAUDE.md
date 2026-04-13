@@ -15,7 +15,7 @@ https://github.com/rudrakumar2012/ChainSteps
 ## Tech Stack
 - Hardhat 2.22, Solidity 0.8.28, OpenZeppelin 5.6
 - Ethereum Sepolia testnet
-- React (frontend), Node.js (backend) - planned
+- Next.js (frontend), Node.js (backend) - planned
 
 ## Current Phase
 Phase 1 complete. Next: Phase 2 (Smart Contract development).

@@ -23,7 +23,7 @@
 - Smart Contract: Solidity 0.8.28
 - Off-Chain: Node.js API
 - Storage: IPFS
-- Frontend: React + MetaMask integration
+- Frontend: Next.js + MetaMask integration
 - Tooling: Hardhat 2.22, OpenZeppelin 5.6, TypeChain
 
 ## Phases
