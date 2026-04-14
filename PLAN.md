@@ -36,12 +36,12 @@
 - [x] Add .gitignore and .env.example
 
 ### Phase 2 (Week 3-6): Smart Contract
-- [ ] Complete milestone logic (createEscrow, addMilestone, fundEscrow)
-- [ ] Implement dispute timeout mechanism
-- [ ] Add freelancer/client approval flow
-- [ ] Implement dispute resolution with arbitrator
-- [ ] Deploy to Sepolia testnet
-- [ ] Write comprehensive contract tests (>90% coverage)
+- [x] Complete milestone logic (createEscrow, addMilestone, fundEscrow)
+- [x] Implement dispute timeout mechanism
+- [x] Add freelancer/client approval flow
+- [x] Implement dispute resolution with arbitrator
+- [x] Deploy to Sepolia testnet
+- [x] Write comprehensive contract tests (>90% coverage)
 
 ### Phase 3 (Week 7-9): Backend
 - [ ] API with Express.js
@@ -71,7 +71,7 @@
 ✅ Doc: Full report + UML diagrams
 
 ## Current Progress
-**Phase 1 Complete** - Project scaffolded with:
-- DecentralizedMilestoneEscrow.sol (3 passing tests)
+**Phase 2 Complete** - Smart contract deployed with:
+- DecentralizedMilestoneEscrow.sol (46 passing tests)
 - Hardhat 2.22 + OpenZeppelin 5.6
-- .gitignore configured
+- Sepolia testnet deployment: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021
