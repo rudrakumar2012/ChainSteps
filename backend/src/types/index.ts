@@ -33,3 +33,16 @@ export interface AddMilestoneRequest {
   description: string;
   amount: string;
 }
+
+export interface FundEscrowRequest {
+  amount: string;
+}
+
+export interface ResolveDisputeRequest {
+  clientPercent: number;
+}
+
+export interface TransactionResult {
+  success: boolean;
+  message?: string;
+}

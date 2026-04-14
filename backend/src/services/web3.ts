@@ -3,6 +3,7 @@ import { config } from "../config/index.js";
 import type { Escrow, Milestone } from "../types/index.js";
 
 let provider: ethers.JsonRpcProvider | null = null;
+let wallet: ethers.Wallet | null = null;
 
 export function getProvider(): ethers.JsonRpcProvider {
   if (!provider) {
@@ -11,6 +12,14 @@ export function getProvider(): ethers.JsonRpcProvider {
   return provider;
 }
 
+export function getWallet(): ethers.Wallet {
+  if (!wallet) {
+    wallet = new ethers.Wallet(config.privateKey, getProvider());
+  }
+  return wallet;
+}
+
+// Read operations
 export async function getEscrow(escrowId: number): Promise<Escrow> {
   const contract = getContract();
   const escrow = await contract.getEscrow(escrowId);
@@ -43,6 +52,62 @@ export async function getApprovalTimeout(escrowId: number): Promise<string> {
   return timeout.toString();
 }
 
+// Write operations
+export async function createEscrow(freelancer: string, arbitrator?: string): Promise<number> {
+  const contract = getContractWithSigner();
+  const tx = await contract.createEscrow(freelancer, arbitrator || ethers.ZeroAddress);
+  const receipt = await tx.wait();
+  const event = receipt?.logs[0];
+  const parsed = contract.interface.parseLog(event);
+  const escrowId = Number(parsed?.args[0]);
+  return escrowId;
+}
+
+export async function addMilestone(escrowId: number, description: string, amount: string): Promise<void> {
+  const contract = getContractWithSigner();
+  const value = ethers.parseEther(amount);
+  const tx = await contract.addMilestone(escrowId, description, value);
+  await tx.wait();
+}
+
+export async function fundEscrow(escrowId: number, amount: string): Promise<void> {
+  const contract = getContractWithSigner();
+  const value = ethers.parseEther(amount);
+  const tx = await contract.fundEscrow(escrowId, { value });
+  await tx.wait();
+}
+
+export async function completeMilestone(escrowId: number): Promise<void> {
+  const contract = getContractWithSigner();
+  const tx = await contract.completeMilestone(escrowId);
+  await tx.wait();
+}
+
+export async function approveMilestone(escrowId: number): Promise<void> {
+  const contract = getContractWithSigner();
+  const tx = await contract.approveMilestone(escrowId);
+  await tx.wait();
+}
+
+export async function raiseDispute(escrowId: number): Promise<void> {
+  const contract = getContractWithSigner();
+  const tx = await contract.raiseDispute(escrowId);
+  await tx.wait();
+}
+
+export async function resolveDispute(escrowId: number, clientPercent: number): Promise<void> {
+  const contract = getContractWithSigner();
+  const tx = await contract.resolveDispute(escrowId, clientPercent);
+  await tx.wait();
+}
+
+export async function claimMilestone(escrowId: number): Promise<void> {
+  const contract = getContractWithSigner();
+  const tx = await contract.claimMilestone(escrowId);
+  await tx.wait();
+}
+
+// Internal
 function getContract() {
   const abi = [
     "function getEscrow(uint256 _escrowId) external view returns (address client, address freelancer, uint8 state, uint256 currentMilestone, uint256 milestoneCount, uint256 totalAmount)",
@@ -50,4 +115,18 @@ function getContract() {
     "function getApprovalTimeout(uint256 _escrowId) external view returns (uint256)",
   ];
   return new ethers.Contract(config.contractAddress, abi, getProvider());
+}
+
+function getContractWithSigner() {
+  const abi = [
+    "function createEscrow(address _freelancer, address _arbitrator) external returns (uint256)",
+    "function addMilestone(uint256 _escrowId, string calldata _description, uint256 _amount) external",
+    "function fundEscrow(uint256 _escrowId) external payable",
+    "function completeMilestone(uint256 _escrowId) external",
+    "function approveMilestone(uint256 _escrowId) external",
+    "function raiseDispute(uint256 _escrowId) external",
+    "function resolveDispute(uint256 _escrowId, uint256 _clientPercent) external",
+    "function claimMilestone(uint256 _escrowId) external",
+  ];
+  return new ethers.Contract(config.contractAddress, abi, getWallet());
 }

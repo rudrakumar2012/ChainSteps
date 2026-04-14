@@ -35,7 +35,7 @@
 - [x] Deploy initial escrow contract skeleton
 - [x] Add .gitignore and .env.example
 
-### Phase 2 (Week 3-6): Smart Contract
+### Phase 2 (Week 3-6): Smart Contract ✅ COMPLETED
 - [x] Complete milestone logic (createEscrow, addMilestone, fundEscrow)
 - [x] Implement dispute timeout mechanism
 - [x] Add freelancer/client approval flow
@@ -43,12 +43,11 @@
 - [x] Deploy to Sepolia testnet
 - [x] Write comprehensive contract tests (>90% coverage)
 
-### Phase 3 (Week 7-9): Backend
-- [x] API with Express.js (Part A)
-- [x] Web3 integration for contract calls (Part A - read operations)
-- [ ] IPFS file upload for milestone evidence
-- [ ] Notification system
-- [ ] Web3 write operations (Part B)
+### Phase 3 (Week 7-9): Backend ✅ COMPLETED
+- [x] API with Express.js
+- [x] Web3 integration for contract calls (read + write operations)
+- [x] IPFS file upload for milestone evidence
+- [x] Notification system
 
 ### Phase 4 (Week 10-12): Frontend
 - [ ] React UI components
@@ -72,7 +71,9 @@
 ✅ Doc: Full report + UML diagrams
 
 ## Current Progress
-**Phase 2 Complete** - Smart contract deployed with:
-- DecentralizedMilestoneEscrow.sol (46 passing tests)
-- Hardhat 2.22 + OpenZeppelin 5.6
-- Sepolia testnet deployment: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021
+**Phase 3 Complete** - Backend API deployed with:
+- Express.js API (13 endpoints)
+- Web3 read/write operations
+- IPFS file upload service
+- Notification system (webhook + email)
+- Sepolia testnet contract: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021
