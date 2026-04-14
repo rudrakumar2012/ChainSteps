@@ -44,10 +44,11 @@
 - [x] Write comprehensive contract tests (>90% coverage)
 
 ### Phase 3 (Week 7-9): Backend
-- [ ] API with Express.js
-- [ ] Web3 integration for contract calls
+- [x] API with Express.js (Part A)
+- [x] Web3 integration for contract calls (Part A - read operations)
 - [ ] IPFS file upload for milestone evidence
 - [ ] Notification system
+- [ ] Web3 write operations (Part B)
 
 ### Phase 4 (Week 10-12): Frontend
 - [ ] React UI components
