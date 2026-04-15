@@ -21,7 +21,27 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Phase 3 (Backend) - Part B complete. Next: Phase 4 (Frontend).
+Phase 4A (Frontend - Project Setup) complete. Next: Phase 4B (Dashboard).
+
+## Frontend Structure
+```
+frontend/
+├── src/
+│   ├── app/
+│   │   ├── globals.css      # Design system (colors, typography)
+│   │   ├── layout.tsx      # Root layout with fonts
+│   │   └── page.tsx        # Dashboard home
+│   ├── components/
+│   │   ├── ui/             # GlassCard, Button, StatusBadge, ProgressBar
+│   │   └── layout/         # Sidebar, TopBar, AppShell
+│   └── types/
+```
+
+## Design System
+- "The Architectural Ledger" - dark fintech theme
+- Surface: #0b1326, Primary: #4cd7f6, Secondary: #4edea3
+- Typography: Space Grotesk (headlines), Inter (body)
+- See `design/BUFS.md` for layout bugs pending fix
 
 ## Backend Structure
 ```

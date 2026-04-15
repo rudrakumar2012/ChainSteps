@@ -50,10 +50,31 @@
 - [x] Notification system
 
 ### Phase 4 (Week 10-12): Frontend
-- [ ] React UI components
-- [ ] MetaMask wallet connection
-- [ ] Contract dashboard
-- [ ] Milestone management UI
+#### Phase 4A: Project Setup & Design System ✅ COMPLETED
+- [x] Initialize Next.js project with TypeScript
+- [x] Configure Tailwind with design system colors (slate palette, cyan accents)
+- [x] Set up typography (Space Grotesk + Inter fonts)
+- [x] Build reusable glass-card, sidebar, and layout components
+- [x] Create navigation shell (sidebar + top bar)
+- [ ] **Layout bugs pending fix** (see `design/BUFS.md`)
+
+#### Phase 4B: Dashboard & Contracts List
+- [ ] Dashboard overview (stats cards: Total Locked, Active Contracts, Pending Milestones)
+- [ ] Active escrow contracts grid with glass-card style
+- [ ] "My Contracts" ledger table with filters (All/As Client/As Freelancer)
+- [ ] Contract row components with role badges and status indicators
+
+#### Phase 4C: Create Escrow & Milestone Management
+- [ ] Multi-step escrow creation wizard (Parties → Milestones → Review → Deploy)
+- [ ] Add/edit/delete milestones with ETH amounts
+- [ ] Contract detail view with milestone funding
+- [ ] "Create New" card with + icon placeholder
+
+#### Phase 4D: Milestone Details & Wallet Integration
+- [ ] Vertical stepper timeline (Released → In Review → Funded → Unfunded)
+- [ ] Approve & Pay / Initiate Dispute action buttons
+- [ ] Evidence links panel with IPFS upload
+- [ ] MetaMask wallet connection (connect, switch network, sign transactions)
 
 ### Phase 5 (Week 13-14): Testing
 - [ ] E2E testing
