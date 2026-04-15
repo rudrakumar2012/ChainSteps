@@ -36,3 +36,9 @@ coverage/
 # Misc
 *.pem
 *.key
+
+# Claude Code local files
+.claude/
+
+# Design/mockup files (local only)
+design/
