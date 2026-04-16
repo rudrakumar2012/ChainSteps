@@ -70,11 +70,11 @@
 - [x] Contract detail view with milestone funding
 - [x] "Create New" card with + icon placeholder
 
-#### Phase 4D: Milestone Details & Wallet Integration
-- [ ] Vertical stepper timeline (Released → In Review → Funded → Unfunded)
-- [ ] Approve & Pay / Initiate Dispute action buttons
-- [ ] Evidence links panel with IPFS upload
-- [ ] MetaMask wallet connection (connect, switch network, sign transactions)
+#### Phase 4D: Milestone Details & Wallet Integration ✅ COMPLETED
+- [x] Vertical stepper timeline (Released → In Review → Funded → Unfunded)
+- [x] Approve & Pay / Initiate Dispute action buttons
+- [x] Evidence links panel with IPFS upload
+- [x] MetaMask wallet connection (connect, switch network, sign transactions)
 
 ### Phase 5 (Week 13-14): Testing
 - [ ] E2E testing
@@ -92,9 +92,9 @@
 ✅ Doc: Full report + UML diagrams
 
 ## Current Progress
-**Phase 4C Complete** - Frontend escrow creation with:
-- Multi-step escrow wizard (Parties → Milestones → Review → Deploy)
-- Milestone editor with add/edit/delete and ETH amounts
-- Contract detail page with milestone timeline
-- Create New card placeholder
+**Phase 4D Complete** - Frontend wallet integration and milestone details:
+- MetaMask wallet connection with connect/switch network/disconnect
+- WalletProvider context for global wallet state
+- Vertical milestone timeline with state indicators
+- Evidence panel with IPFS drag-and-drop upload
 - Sepolia testnet contract: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021
