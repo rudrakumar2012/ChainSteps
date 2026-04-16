@@ -58,11 +58,11 @@
 - [x] Create navigation shell (sidebar + top bar)
 - [ ] **Layout bugs pending fix** (see `design/BUFS.md`)
 
-#### Phase 4B: Dashboard & Contracts List
-- [ ] Dashboard overview (stats cards: Total Locked, Active Contracts, Pending Milestones)
-- [ ] Active escrow contracts grid with glass-card style
-- [ ] "My Contracts" ledger table with filters (All/As Client/As Freelancer)
-- [ ] Contract row components with role badges and status indicators
+#### Phase 4B: Dashboard & Contracts List ✅ COMPLETED
+- [x] Dashboard overview (stats cards: Total Locked, Active Contracts, Pending Milestones)
+- [x] Active escrow contracts grid with glass-card style
+- [x] "My Contracts" ledger table with filters (All/As Client/As Freelancer)
+- [x] Contract row components with role badges and status indicators
 
 #### Phase 4C: Create Escrow & Milestone Management
 - [ ] Multi-step escrow creation wizard (Parties → Milestones → Review → Deploy)
@@ -92,9 +92,9 @@
 ✅ Doc: Full report + UML diagrams
 
 ## Current Progress
-**Phase 3 Complete** - Backend API deployed with:
-- Express.js API (13 endpoints)
-- Web3 read/write operations
-- IPFS file upload service
-- Notification system (webhook + email)
+**Phase 4B Complete** - Frontend dashboard with:
+- Stats cards (Total Locked, Active Contracts, Pending Milestones)
+- Active escrows grid with glass-card style
+- Contracts ledger table with role filters (All/Client/Freelancer)
+- Contract row components with role badges and status indicators
 - Sepolia testnet contract: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021

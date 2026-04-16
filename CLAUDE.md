@@ -21,7 +21,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Phase 4A (Frontend - Project Setup) complete. Next: Phase 4B (Dashboard).
+Phase 4B (Dashboard & Contracts List) complete. Next: Phase 4C (Create Escrow & Milestone Management).
 
 ## Frontend Structure
 ```
@@ -33,8 +33,10 @@ frontend/
 │   │   └── page.tsx        # Dashboard home
 │   ├── components/
 │   │   ├── ui/             # GlassCard, Button, StatusBadge, ProgressBar
-│   │   └── layout/         # Sidebar, TopBar, AppShell
-│   └── types/
+│   │   ├── layout/         # Sidebar, TopBar, AppShell
+│   │   ├── dashboard/      # Dashboard, StatsCard
+│   │   └── contracts/      # ContractRow, ContractsGrid, ContractsLedger
+│   └── types/              # Escrow, Milestone, EscrowState, DashboardStats
 ```
 
 ## Design System
