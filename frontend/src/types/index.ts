@@ -26,6 +26,11 @@ export interface Milestone {
   approvalTimeout: string;
 }
 
+export interface MilestoneInput {
+  description: string;
+  amount: string;
+}
+
 export interface EscrowWithMilestones extends Escrow {
   milestones: Milestone[];
 }
@@ -37,4 +42,10 @@ export interface DashboardStats {
   totalLocked: string;
   activeContracts: number;
   pendingMilestones: number;
+}
+
+export interface CreateEscrowFormData {
+  freelancer: string;
+  arbitrator?: string;
+  milestones: MilestoneInput[];
 }

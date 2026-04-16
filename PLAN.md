@@ -64,11 +64,11 @@
 - [x] "My Contracts" ledger table with filters (All/As Client/As Freelancer)
 - [x] Contract row components with role badges and status indicators
 
-#### Phase 4C: Create Escrow & Milestone Management
-- [ ] Multi-step escrow creation wizard (Parties → Milestones → Review → Deploy)
-- [ ] Add/edit/delete milestones with ETH amounts
-- [ ] Contract detail view with milestone funding
-- [ ] "Create New" card with + icon placeholder
+#### Phase 4C: Create Escrow & Milestone Management ✅ COMPLETED
+- [x] Multi-step escrow creation wizard (Parties → Milestones → Review → Deploy)
+- [x] Add/edit/delete milestones with ETH amounts
+- [x] Contract detail view with milestone funding
+- [x] "Create New" card with + icon placeholder
 
 #### Phase 4D: Milestone Details & Wallet Integration
 - [ ] Vertical stepper timeline (Released → In Review → Funded → Unfunded)
@@ -92,9 +92,9 @@
 ✅ Doc: Full report + UML diagrams
 
 ## Current Progress
-**Phase 4B Complete** - Frontend dashboard with:
-- Stats cards (Total Locked, Active Contracts, Pending Milestones)
-- Active escrows grid with glass-card style
-- Contracts ledger table with role filters (All/Client/Freelancer)
-- Contract row components with role badges and status indicators
+**Phase 4C Complete** - Frontend escrow creation with:
+- Multi-step escrow wizard (Parties → Milestones → Review → Deploy)
+- Milestone editor with add/edit/delete and ETH amounts
+- Contract detail page with milestone timeline
+- Create New card placeholder
 - Sepolia testnet contract: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021
