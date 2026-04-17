@@ -30,10 +30,13 @@ frontend/
 │   ├── app/
 │   │   ├── globals.css      # Design system (colors, typography)
 │   │   ├── layout.tsx      # Root layout with fonts
-│   │   └── page.tsx        # Dashboard home
+│   │   ├── page.tsx        # Homepage (landing page)
+│   │   └── dashboard/
+│   │       └── page.tsx    # Dashboard home (moved from root)
 │   ├── components/
 │   │   ├── ui/             # GlassCard, Button, StatusBadge, ProgressBar
 │   │   ├── layout/         # Sidebar, TopBar, AppShell (with WalletProvider)
+│   │   ├── homepage/       # HomeHeader, Hero, FeatureGrid, HowItWorks, TrustIndicators
 │   │   ├── dashboard/      # Dashboard, StatsCard
 │   │   ├── contracts/      # ContractRow, ContractsGrid, ContractsLedger, ContractDetail, CreateNewCard
 │   │   ├── create/         # EscrowWizard, PartiesStep, MilestonesStep, ReviewStep

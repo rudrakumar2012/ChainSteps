@@ -14,8 +14,8 @@ export function TopBar() {
         <div className="bg-surface-container-high/50 px-4 py-1.5 rounded-full flex items-center gap-2 border border-outline-variant/20">
           <span
             className={`w-2 h-2 rounded-full ${
-              isSepolia ? "bg-secondary" : "bg-error"
-            } shadow-[0_0_8px_${isSepolia ? "#4edea3" : "#ffb4ab"}]`}
+              isSepolia ? "bg-secondary shadow-[0_0_8px_#4edea3]" : "bg-error shadow-[0_0_8px_#ffb4ab]"
+            }`}
           />
           <span className="font-body text-sm font-medium text-on-surface-variant">
             {isSepolia ? "Sepolia Network" : "Wrong Network"}
@@ -33,7 +33,7 @@ export function TopBar() {
             settings
           </span>
         </div>
-        <ConnectButton />
+        <ConnectButton location="dashboard" />
       </div>
     </header>
   );

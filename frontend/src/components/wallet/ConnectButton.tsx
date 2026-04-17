@@ -2,12 +2,13 @@
 
 import { useWalletContext } from "./WalletProvider";
 import { Button } from "../ui/Button";
+import { useEffect } from "react";
 
 function truncateAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-export function ConnectButton() {
+export function ConnectButton({ location = "unknown" }: { location?: string }) {
   const {
     address,
     isConnected,
@@ -16,6 +17,16 @@ export function ConnectButton() {
     connect,
     switchToSepolia,
   } = useWalletContext();
+
+  useEffect(() => {
+    console.log(`[ConnectButton ${location}] wallet state:`, {
+      address,
+      isConnected,
+      isConnecting,
+      isWrongNetwork,
+      timestamp: new Date().toISOString(),
+    });
+  }, [address, isConnected, isConnecting, isWrongNetwork, location]);
 
   if (isConnecting) {
     return (
