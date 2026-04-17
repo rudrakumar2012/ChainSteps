@@ -16,7 +16,7 @@
     "dotenv": "^16.4.7",
     "ethers": "^6.13.5",
     "express": "^4.21.2",
-    "ipfs-http-client": "^60.0.1"
+    "ipfs-http-client": "^56.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
