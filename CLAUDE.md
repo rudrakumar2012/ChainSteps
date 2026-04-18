@@ -21,7 +21,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Phase 4 (Frontend) COMPLETED - All phases 4A through 4D done, including a comprehensive refactor of the wallet connection logic for robust, seamless standard MetaMask integration. Next: Phase 5 (Testing) and fulfilling remaining missing pages.
+Phase 4 (Frontend) COMPLETED — All phases 4A through 4E done. Core pages implemented: `/contracts`, `/contracts/[id]`, `/create`. Remaining: `/disputes` page (TICKET-006), layout bugs, mobile responsiveness, design compliance. Next: Phase 5 (Testing).
 
 ## Frontend Structure
 ```
@@ -31,8 +31,14 @@ frontend/
 │   │   ├── globals.css      # Design system (colors, typography)
 │   │   ├── layout.tsx      # Root layout with fonts
 │   │   ├── page.tsx        # Homepage (landing page)
-│   │   └── dashboard/
-│   │       └── page.tsx    # Dashboard home (moved from root)
+│   │   ├── dashboard/
+│   │   │   └── page.tsx    # Dashboard home (moved from root)
+│   │   ├── contracts/
+│   │   │   ├── page.tsx    # My Contracts / Ledger page
+│   │   │   └── [id]/
+│   │   │       └── page.tsx # Contract detail (milestone timeline, evidence)
+│   │   └── create/
+│   │       └── page.tsx    # New escrow wizard (vertical stepper)
 │   ├── components/
 │   │   ├── ui/             # GlassCard, Button, StatusBadge, ProgressBar
 │   │   ├── layout/         # Sidebar, TopBar, AppShell (with WalletProvider)

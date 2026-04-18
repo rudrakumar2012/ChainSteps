@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout";
 import { Dashboard } from "@/components/dashboard";
 import { Escrow, EscrowState } from "@/types";
@@ -63,9 +64,10 @@ const mockEscrows: Escrow[] = [
 const MOCK_ADDRESS = "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21";
 
 export default function Home() {
+  const router = useRouter();
+
   const handleContractClick = (escrow: Escrow) => {
-    console.log("Contract clicked:", escrow.id);
-    // TODO: Navigate to contract detail page
+    router.push(`/contracts/${escrow.id}`);
   };
 
   return (

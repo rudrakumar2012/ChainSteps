@@ -76,6 +76,12 @@
 - [x] Evidence links panel with IPFS upload
 - [x] MetaMask wallet connection (connect, switch network, sign transactions)
 
+#### Phase 4E: Core Pages ✅ COMPLETED
+- [x] /contracts (My Contracts / Ledger) page with filter tabs, metric cards, table, pagination
+- [x] /contracts/[id] (Contract Detail) page with milestone timeline, evidence panel, participants
+- [x] /create (New Escrow) page with vertical stepper layout, summary card, deploy button
+- [ ] /disputes page (TICKET-006 — still missing)
+
 ### Phase 5 (Week 13-14): Testing
 - [ ] E2E testing
 - [ ] Bug fixes
@@ -92,9 +98,11 @@
 ✅ Doc: Full report + UML diagrams
 
 ## Current Progress
-**Phase 4D Complete** - Frontend wallet integration and milestone details:
-- Refactored `useWallet` hook using standard window.ethereum for reliable, seamless connection flow.
-- Improved UX for wallet connection, including local storage caching for disconnected states.
-- Vertical milestone timeline with state indicators
-- Evidence panel with IPFS drag-and-drop upload
+**Phase 4E Complete** — All core frontend pages implemented:
+- `/contracts` — Ledger page with filter tabs, metric cards, contract table, pagination
+- `/contracts/[id]` — Contract detail with vertical milestone timeline, evidence panel, participants sidebar
+- `/create` — New escrow wizard with vertical stepper layout, summary card, deploy button
+- Dashboard contract clicks now navigate to `/contracts/[id]`
+- Homepage Connect Wallet now redirects to dashboard on connect
+- Remaining: `/disputes` page (TICKET-006), layout bugs, mobile responsiveness, design compliance
 - Sepolia testnet contract: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021

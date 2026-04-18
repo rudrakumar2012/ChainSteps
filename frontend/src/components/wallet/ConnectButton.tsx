@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import { useWalletContext } from "./WalletProvider";
 import { Button } from "../ui/Button";
 
@@ -7,7 +8,13 @@ function truncateAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-export function ConnectButton({ location = "unknown" }: { location?: string }) {
+export function ConnectButton({
+  location = "unknown",
+  onConnected,
+}: {
+  location?: string;
+  onConnected?: () => void;
+}) {
   const {
     address,
     isConnected,
@@ -18,6 +25,14 @@ export function ConnectButton({ location = "unknown" }: { location?: string }) {
     disconnect,
     error,
   } = useWalletContext();
+
+  const prevConnectedRef = useRef(isConnected);
+  useEffect(() => {
+    if (isConnected && !prevConnectedRef.current) {
+      onConnected?.();
+    }
+    prevConnectedRef.current = isConnected;
+  }, [isConnected, onConnected]);
 
   if (isConnecting) {
     return (

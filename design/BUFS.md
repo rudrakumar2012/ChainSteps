@@ -57,7 +57,7 @@
 
 **C. Wallet Connection State**
 - **Issue:** Wallet placeholder shows "Not Connected" but no real wallet state management
-- **Status:** Phase 4D (Wallet Integration) task
+- **Status:** ✅ DONE (Phase 4D + homepage redirect on connect)
 
 ---
 
@@ -119,7 +119,7 @@
 - **Issue:** Page linked in Sidebar but doesn't exist
 - **Design Reference:** `design/my_contracts/code.html`
 - **File:** `frontend/src/app/contracts/page.tsx`
-- **Status:** MISSING - Needs Implementation
+- **Status:** ✅ DONE
 - **Components from design:**
   - Page header: "Ledger" (display font, 3.5rem) + "TRANSACTIONAL OVERVIEW & CONTRACTS" subtitle
   - Filter tabs: All / As Client / As Freelancer
@@ -139,7 +139,7 @@
 - **Issue:** Clicking contracts in dashboard has no destination
 - **Design Reference:** `design/milestone_details/code.html`
 - **File:** `frontend/src/app/contracts/[id]/page.tsx`
-- **Status:** MISSING - Needs Implementation
+- **Status:** ✅ DONE
 - **Components from design:**
   - Breadcrumb: Contracts > Contract Name
   - Contract header: ID badge, title, description, total value
@@ -162,7 +162,7 @@
 - **Issue:** Page linked in Sidebar but doesn't exist
 - **Design Reference:** `design/create_new_escrow/code.html`
 - **File:** `frontend/src/app/create/page.tsx`
-- **Status:** MISSING - Needs Implementation
+- **Status:** ✅ DONE
 - **Components from design:**
   - Page header: "New Escrow #0042" with description
   - 3-step vertical stepper (Basic Info → Milestones → Review)
@@ -216,7 +216,7 @@
 **TICKET-009: "Mark Complete" Button Does Nothing**
 - **Issue:** MilestoneTimeline's "Mark Complete" button has no `onClick` handler
 - **File:** `frontend/src/components/milestone/MilestoneTimeline.tsx:148`
-- **Status:** To Fix
+- **Status:** To Fix (unblocked — TICKET-004 is done)
 - **Design Reference:** `design/milestone_details/code.html:214-221` shows client action buttons (Approve & Pay, Initiate Dispute)
 - **Fix:** Add `onClick={() => onApprove?.(index)}` similar to the approve button. For freelancer role, add "Mark Complete" handler.
 - **Note:** `currentAddress` prop is accepted but never used - could determine button visibility based on wallet address
@@ -224,9 +224,8 @@
 **TICKET-010: handleContractClick is Incomplete TODO**
 - **Issue:** Contract click handler only logs to console, doesn't navigate
 - **File:** `frontend/src/app/page.tsx:66-69`
-- **Status:** To Fix
-- **Fix:** Add `router.push('/contracts/${escrow.id}')` or use Next.js navigation. Depends on TICKET-004.
-- **Note:** Written as TODO comment: "Navigate to contract detail page"
+- **Status:** ✅ DONE
+- **Fix:** Added `router.push('/contracts/${escrow.id}')` in dashboard page. Depends on TICKET-004.
 
 **TICKET-011: Sidebar Wallet Section Not Clickable**
 - **Issue:** Sidebar shows "Not Connected" / "Connect Wallet" but has no click handler to trigger wallet connection
@@ -342,9 +341,9 @@
 - **Status:** Nice to Have
 
 **SUGGEST-004: Add Pagination Component**
-- **Issue:** My Contracts page design shows pagination but no component exists
+- **Issue:** Pagination is currently inline in `/contracts` page — should be extracted to reusable component
 - **File:** Would need `frontend/src/components/ui/Pagination.tsx`
-- **Status:** Nice to Have
+- **Status:** Nice to Have (inline pagination exists on /contracts page)
 - **Design Reference:** `design/my_contracts/code.html:334-343`
 
 **SUGGEST-005: Add Table Component**
@@ -367,16 +366,16 @@
 ### Phase 2: Core Pages
 | Order | Ticket | Title | Blocking |
 |-------|--------|-------|----------|
-| 5 | TICKET-003 | Create /contracts page | None |
-| 6 | TICKET-005 | Create /create page | None |
-| 7 | TICKET-004 | Create /contracts/[id] page | TICKET-003 |
+| 5 | TICKET-003 | Create /contracts page | ✅ DONE |
+| 6 | TICKET-005 | Create /create page | ✅ DONE |
+| 7 | TICKET-004 | Create /contracts/[id] page | ✅ DONE |
 | 8 | TICKET-006 | Create /disputes page | None |
 
 ### Phase 3: Fix Broken Interactions
 | Order | Ticket | Title | Blocking |
 |-------|--------|-------|----------|
-| 9 | TICKET-009 | Fix "Mark Complete" button | TICKET-004 |
-| 10 | TICKET-010 | Fix handleContractClick navigation | TICKET-004 |
+| 9 | TICKET-009 | Fix "Mark Complete" button | None |
+| 10 | TICKET-010 | Fix handleContractClick navigation | ✅ DONE (unblocked by TICKET-004) |
 | 11 | TICKET-011 | Fix Sidebar wallet click | ✅ DONE |
 
 ### Phase 4: Styling & Mobile

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback } from "react";
 import { ConnectButton } from "../wallet/ConnectButton";
 import { useWalletContext } from "../wallet/WalletProvider";
 
@@ -20,7 +21,14 @@ const navItems: NavItem[] = [
 
 export function HomeHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isConnected } = useWalletContext();
+
+  const handleConnected = useCallback(() => {
+    if (pathname === "/") {
+      router.push("/dashboard");
+    }
+  }, [pathname, router]);
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -78,7 +86,7 @@ export function HomeHeader() {
 
           {/* Wallet Connection */}
           <div className="flex items-center gap-4">
-            <ConnectButton location="homepage" />
+            <ConnectButton location="homepage" onConnected={handleConnected} />
           </div>
         </div>
 
