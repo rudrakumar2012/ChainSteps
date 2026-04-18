@@ -12,7 +12,8 @@ https://github.com/rudrakumar2012/ChainSteps
 - `test/Escrow.ts` - Contract tests (46 tests)
 - `scripts/deploy.ts` - Deployment script
 - `backend/` - Express.js API server
-- `PLAN.md` - Full project plan
+- `TICKETS_REAL_DATA.md` - Real data integration tickets (active work tracker)
+- `EXPLANATION.md` - Project explanation (for submission/report)
 
 ## Tech Stack
 - Hardhat 2.22, Solidity 0.8.28, OpenZeppelin 5.6
@@ -21,7 +22,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Phase 4 (Frontend) COMPLETED — All phases 4A through 4E done. All core pages + mobile responsive + UX fixes done. Remaining: design compliance (018-020), code quality (021-024). Next: Phase 5 (Testing).
+Real Data Integration (Phase 1 of 5 DONE) — Frontend contract client, types, and API client built. Pages still use mock data. See `TICKETS_REAL_DATA.md` for remaining phases. Next: Phase 2 (Data hooks + backend endpoints).
 
 ## Frontend Structure
 ```
@@ -52,14 +53,15 @@ frontend/
 │   │   ├── evidence/        # EvidencePanel
 │   │   └── wallet/         # WalletProvider, ConnectButton
 │   ├── hooks/              # useWallet
-│   └── types/              # Escrow, Milestone, EscrowState, CreateEscrowFormData
+│   ├── lib/                # provider.ts, contract.ts, api.ts, abi.json
+│   └── types/              # Escrow, Milestone, EscrowState, TransactionStatus, Dispute
 ```
 
 ## Design System
 - "The Architectural Ledger" - dark fintech theme
 - Surface: #0b1326, Primary: #4cd7f6, Secondary: #4edea3
 - Typography: Space Grotesk (headlines), Inter (body)
-- See `design/BUFS.md` for layout bugs pending fix
+- See `TICKETS_REAL_DATA.md` for pending work
 
 ## Backend Structure
 ```

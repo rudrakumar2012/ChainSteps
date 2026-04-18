@@ -4,9 +4,9 @@ Each phase = one commit checkpoint. Phases build sequentially.
 
 ---
 
-## Phase 1: Foundation — Types, Contract Client, API Client
+## Phase 1: Foundation — Types, Contract Client, API Client ✅ DONE
 
-### TICKET-RD-01: Update frontend types for real data
+### TICKET-RD-01: Update frontend types for real data ✅
 **Files:** `frontend/src/types/index.ts`
 - Add `ContractEscrow` type matching raw contract response (disputeTimeout, arbitrator fields)
 - Add `TransactionStatus` type (`idle | pending | confirmed | failed` + txHash)
@@ -14,14 +14,14 @@ Each phase = one commit checkpoint. Phases build sequentially.
 - Add `cancelEscrow` / `claimMilestone` to `CreateEscrowFormData`-related action types
 - Keep existing types backward-compatible (pages still use mock data until Phase 3)
 
-### TICKET-RD-02: Create contract client layer
+### TICKET-RD-02: Create contract client layer ✅
 **Files:** `frontend/src/lib/provider.ts`, `frontend/src/lib/contract.ts`
 - `provider.ts` — Get ethers `BrowserProvider` from `window.ethereum`, memoized singleton
 - `contract.ts` — Load ABI from compiled artifacts (copy minimal ABI JSON to `frontend/src/lib/abi.json`), create typed read/write helpers wrapping the contract instance at the deployed address
 - Export: `getReadContract()`, `getWriteContract()`, `CONTRACT_ADDRESS`
 - Export typed wrappers: `fetchEscrow(id)`, `fetchMilestone(escrowId, index)`, `fetchMilestoneCount(escrowId)`
 
-### TICKET-RD-03: Create backend API client
+### TICKET-RD-03: Create backend API client ✅
 **File:** `frontend/src/lib/api.ts`
 - Simple fetch wrapper with base URL from `NEXT_PUBLIC_API_URL` (default `http://localhost:3001`)
 - Typed response helpers for: `uploadEvidence()`, `healthCheck()`
@@ -117,7 +117,7 @@ Each phase = one commit checkpoint. Phases build sequentially.
 
 | Phase | Tickets | What's working after commit |
 |-------|---------|---------------------------|
-| 1 | RD-01, 02, 03 | Contract reads work from frontend, types aligned, API client ready |
+| 1 | RD-01, 02, 03 | Contract reads work from frontend, types aligned, API client ready | ✅ |
 | 2 | RD-04, 05 | Data hooks fetch real on-chain data, backend can list escrows |
 | 3 | RD-06, 07, 08, 09 | All pages show real data (reads), no more mock data |
 | 4 | RD-10, 11, 12 | Full write flow — create escrows, fund, approve, dispute, claim, cancel |
