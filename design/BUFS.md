@@ -231,9 +231,9 @@
 **TICKET-011: Sidebar Wallet Section Not Clickable**
 - **Issue:** Sidebar shows "Not Connected" / "Connect Wallet" but has no click handler to trigger wallet connection
 - **File:** `frontend/src/components/layout/Sidebar.tsx:64-72`
-- **Status:** To Fix
+- **Status:** ✅ DONE
 - **Design Reference:** Shows wallet avatar and "Verified User" badge
-- **Fix:** Wrap in button or add onClick to trigger wallet connection flow. Should use `useWallet()` hook.
+- **Fix:** Replaced with a `WalletConnection` component that uses `useWalletContext` to handle connecting and displaying user address dynamically with a disconnect button.
 
 ### DYNAMIC TAILWIND CLASSES (MEDIUM PRIORITY)
 
@@ -377,7 +377,7 @@
 |-------|--------|-------|----------|
 | 9 | TICKET-009 | Fix "Mark Complete" button | TICKET-004 |
 | 10 | TICKET-010 | Fix handleContractClick navigation | TICKET-004 |
-| 11 | TICKET-011 | Fix Sidebar wallet click | None |
+| 11 | TICKET-011 | Fix Sidebar wallet click | ✅ DONE |
 
 ### Phase 4: Styling & Mobile
 | Order | Ticket | Title | Blocking |

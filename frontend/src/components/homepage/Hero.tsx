@@ -4,9 +4,29 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useWalletContext } from "../wallet/WalletProvider";
 
 export function Hero() {
   const [gradientIndex, setGradientIndex] = useState(0);
+  const { isConnected, connect } = useWalletContext();
+  const router = useRouter();
+  const [wantsToLaunch, setWantsToLaunch] = useState(false);
+
+  useEffect(() => {
+    if (isConnected && wantsToLaunch) {
+      router.push("/dashboard");
+    }
+  }, [isConnected, wantsToLaunch, router]);
+
+  const handleLaunch = () => {
+    if (isConnected) {
+      router.push("/dashboard");
+    } else {
+      setWantsToLaunch(true);
+      connect();
+    }
+  };
 
   const gradients = [
     "linear-gradient(135deg, #4cd7f6 0%, #06b6d4 50%, #4edea3 100%)",
@@ -101,12 +121,10 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
-            <Link href="/dashboard">
-              <Button variant="primary" size="lg">
-                <span className="material-symbols-outlined">rocket_launch</span>
-                Launch App
-              </Button>
-            </Link>
+            <Button variant="primary" size="lg" onClick={handleLaunch}>
+              <span className="material-symbols-outlined">rocket_launch</span>
+              Launch App
+            </Button>
             <Button variant="ghost" size="lg">
               <span className="material-symbols-outlined">play_circle</span>
               View Demo

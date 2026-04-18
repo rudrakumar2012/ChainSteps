@@ -56,7 +56,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const shadowClasses = {
+const shadowClasses: Record<string, string> = {
   primary: "shadow-primary/20",
   secondary: "shadow-secondary/20",
   tertiary: "shadow-tertiary/20",

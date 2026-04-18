@@ -93,8 +93,8 @@
 
 ## Current Progress
 **Phase 4D Complete** - Frontend wallet integration and milestone details:
-- MetaMask wallet connection with connect/switch network/disconnect
-- WalletProvider context for global wallet state
+- Refactored `useWallet` hook using standard window.ethereum for reliable, seamless connection flow.
+- Improved UX for wallet connection, including local storage caching for disconnected states.
 - Vertical milestone timeline with state indicators
 - Evidence panel with IPFS drag-and-drop upload
 - Sepolia testnet contract: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021
