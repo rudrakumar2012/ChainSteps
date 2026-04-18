@@ -118,7 +118,7 @@ export default function DisputesPage() {
     <AppShell>
       {/* Page Header */}
       <div className="mb-12">
-        <h2 className="headline-font text-[3.5rem] leading-none font-bold text-white -ml-1">
+        <h2 className="headline-font text-[2rem] sm:text-[2.75rem] md:text-[3.5rem] leading-none font-bold text-white -ml-1">
           Disputes
         </h2>
         <p className="text-primary tracking-[0.3em] font-medium text-xs mt-2">
@@ -202,7 +202,7 @@ export default function DisputesPage() {
               className="glass-card rounded-2xl border border-white/5 shadow-xl overflow-hidden"
             >
               {/* Card Header */}
-              <div className="bg-surface-container-high/50 px-8 py-5 flex items-center justify-between">
+              <div className="bg-surface-container-high/50 px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-4">
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
@@ -230,7 +230,7 @@ export default function DisputesPage() {
               </div>
 
               {/* Card Body */}
-              <div className="px-8 py-6 space-y-4">
+              <div className="px-4 sm:px-8 py-6 space-y-4">
                 {/* Disputed Milestone */}
                 <div className="flex items-center gap-3 bg-surface-container-low rounded-xl p-4">
                   <span className="material-symbols-outlined text-primary">flag</span>
@@ -268,7 +268,7 @@ export default function DisputesPage() {
                 )}
 
                 {/* Meta Row */}
-                <div className="flex items-center gap-6 text-[11px] text-on-surface-variant font-medium pt-2">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-[11px] text-on-surface-variant font-medium pt-2">
                   <span className="flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">event</span>
                     Filed: {dispute.initiatedAt}

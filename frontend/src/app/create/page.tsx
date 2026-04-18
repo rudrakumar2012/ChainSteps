@@ -109,8 +109,8 @@ export default function CreateEscrowPage() {
     <AppShell>
       {/* Editorial Header */}
       <section className="mb-12 max-w-4xl">
-        <div className="flex items-baseline space-x-4 mb-2">
-          <h1 className="headline-font text-5xl font-bold tracking-tight text-white">
+        <div className="flex flex-wrap items-baseline gap-2 sm:gap-4 mb-2">
+          <h1 className="headline-font text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
             New Escrow
           </h1>
           <span className="text-primary headline-font text-xl opacity-50">#0042</span>
@@ -122,10 +122,10 @@ export default function CreateEscrowPage() {
       </section>
 
       {/* Multi-Step Layout */}
-      <div className="grid grid-cols-12 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
         {/* Left Column: Vertical Stepper Track */}
-        <div className="col-span-3">
-          <div className="sticky top-28 space-y-12">
+        <div className="hidden md:block md:col-span-3">
+          <div className="md:sticky md:top-28 space-y-12">
             {STEPS.map((step, index) => {
               const isCompleted = currentIndex > index;
               const isActive = currentIndex === index;
@@ -188,7 +188,7 @@ export default function CreateEscrowPage() {
         </div>
 
         {/* Right Column: Form Canvas */}
-        <div className="col-span-9 space-y-8">
+        <div className="md:col-span-9 space-y-8">
           {/* Step Content */}
           {currentStep === "parties" && (
             <div className="glass-card rounded-xl p-8 border border-white/5 shadow-xl relative overflow-hidden">
@@ -286,18 +286,18 @@ export default function CreateEscrowPage() {
           </div>
 
           {/* Summary & Deploy Section */}
-          <div className="grid grid-cols-3 gap-8 items-end">
-            <div className="col-span-2 glass-card rounded-xl p-8 border border-primary/20 bg-primary/5 relative">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-end">
+            <div className="md:col-span-2 glass-card rounded-xl p-8 border border-primary/20 bg-primary/5 relative">
               <div className="absolute -top-3 -left-3 bg-primary text-on-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg shadow-primary/20">
                 Summary
               </div>
-              <div className="flex justify-between items-end">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
                     Total Locked Value
                   </p>
                   <div className="flex items-baseline space-x-2">
-                    <span className="headline-font text-4xl font-bold text-white">
+                    <span className="headline-font text-2xl sm:text-3xl md:text-4xl font-bold text-white">
                       {totalAmount.toFixed(2)}
                     </span>
                     <span className="headline-font text-xl text-primary font-medium">ETH</span>

@@ -139,7 +139,7 @@ export default function ContractsPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
-          <h2 className="headline-font text-[3.5rem] leading-none font-bold text-white -ml-1">
+          <h2 className="headline-font text-[2rem] sm:text-[2.75rem] md:text-[3.5rem] leading-none font-bold text-white -ml-1">
             Ledger
           </h2>
           <p className="text-primary tracking-[0.3em] font-medium text-xs mt-2">
@@ -204,7 +204,7 @@ export default function ContractsPage() {
       {/* Contract Table */}
       <div className="bg-surface-container rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
         {/* Table Header */}
-        <div className="bg-surface-container-high/50 px-8 py-5 flex items-center justify-between">
+        <div className="bg-surface-container-high/50 px-4 sm:px-8 py-5 flex items-center justify-between gap-2">
           <h3 className="font-bold headline-font text-lg text-white">Recent Contracts</h3>
           <div className="flex items-center space-x-4">
             <button className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
@@ -317,7 +317,7 @@ export default function ContractsPage() {
         </div>
 
         {/* Pagination */}
-        <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-surface-container-low/10">
+        <div className="px-4 sm:px-8 py-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 bg-surface-container-low/10">
           <p className="text-[10px] text-on-surface-variant font-medium">
             Showing <span className="text-white">{filteredEscrows.length}</span> of{" "}
             <span className="text-white">{mockEscrows.length}</span> contracts

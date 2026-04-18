@@ -63,7 +63,7 @@ export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) 
         <StatusBadge status={status} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
         <div className="bg-surface-container-low rounded-lg p-3">
           <p className="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">
             Total Value

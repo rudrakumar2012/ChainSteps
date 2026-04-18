@@ -209,7 +209,7 @@ export function ContractDetail({
       {/* Fund Action */}
       {escrow.state === EscrowState.Created && isClient && (
         <div className="glass-card p-5 border border-primary/20">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <p className="text-sm font-bold text-white mb-1">Fund This Escrow</p>
               <p className="text-xs text-on-surface-variant">

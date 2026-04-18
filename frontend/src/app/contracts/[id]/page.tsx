@@ -106,12 +106,12 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Header Section */}
-      <div className="mb-12 flex justify-between items-end">
+      <div className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
             Contract ID: {escrow.id}
           </span>
-          <h1 className="headline-font text-5xl font-bold tracking-tighter text-on-surface mb-2">
+          <h1 className="headline-font text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-on-surface mb-2">
             {escrow.title}
           </h1>
           <p className="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
@@ -120,7 +120,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         </div>
         <div className="text-right">
           <div className="text-on-surface-variant text-sm font-medium mb-1">Total Escrow Value</div>
-          <div className="headline-font text-4xl font-bold text-on-surface">
+          <div className="headline-font text-2xl sm:text-3xl md:text-4xl font-bold text-on-surface">
             {escrow.totalAmount} <span className="text-primary-container">ETH</span>
           </div>
           <div className="text-[10px] text-secondary font-bold flex items-center justify-end gap-1 mt-1">
@@ -136,9 +136,9 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Bento Grid Layout */}
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         {/* Timeline Section (Col 8) */}
-        <div className="col-span-8 space-y-8">
+        <div className="md:col-span-8 space-y-8">
           <div className="bg-surface-container rounded-xl p-8 backdrop-blur-md relative overflow-hidden">
             <div className="flex justify-between items-center mb-10">
               <h2 className="headline-font text-xl font-bold flex items-center gap-3">
@@ -195,7 +195,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                           : "bg-surface-container-high/40 border border-outline-variant/10"
                       } ${state === "unfunded" ? "opacity-40" : isFunded ? "opacity-60" : ""}`}
                     >
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
                         <h3
                           className={`text-lg font-semibold ${
                             isActive ? "text-primary font-bold" : "text-white"
@@ -252,7 +252,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
 
                       {/* Action Buttons for Active Milestone */}
                       {isActive && (
-                        <div className="flex gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
+                        <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
                           <button
                             onClick={() => console.log("Approve milestone", index)}
                             className="flex-1 bg-secondary text-on-secondary font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all"
@@ -280,7 +280,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         {/* Side Panel (Col 4) */}
-        <div className="col-span-4 space-y-8">
+        <div className="md:col-span-4 space-y-8">
           {/* Evidence Links */}
           <div className="bg-surface-container rounded-xl p-6 border border-outline-variant/10">
             <h3 className="text-sm font-bold uppercase tracking-widest text-primary mb-6">
