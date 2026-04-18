@@ -29,16 +29,16 @@ Each phase = one commit checkpoint. Phases build sequentially.
 
 ---
 
-## Phase 2: Data Layer — Hooks + Backend Endpoints
+## Phase 2: Data Layer — Hooks + Backend Endpoints ✅ DONE
 
-### TICKET-RD-04: Create data hooks
+### TICKET-RD-04: Create data hooks ✅
 **Files:** `frontend/src/hooks/useEscrows.ts`, `frontend/src/hooks/useEscrowDetail.ts`, `frontend/src/hooks/useDashboard.ts`
 - `useEscrows(address?)` — Fetch all escrows by iterating `escrowCreators` mapping + `getEscrow`. Loading/error states, auto-refresh on new blocks.
 - `useEscrowDetail(id)` — Fetch escrow + all milestones in parallel. Loading/error states.
 - `useDashboard(address?)` — Aggregate stats from escrow list (totalLocked, activeCount, pendingMilestones).
 - All hooks return `{ data, loading, error, refetch }`
 
-### TICKET-RD-05: Add missing backend endpoints
+### TICKET-RD-05: Add missing backend endpoints ✅
 **Files:** `backend/src/routes/escrow.ts`, `backend/src/services/web3.ts`
 - `GET /escrow` — List all escrows (iterate on-chain, cache results, `?address=` filter)
 - `GET /escrow/:id/milestones` — Return all milestones for an escrow in one call
@@ -118,7 +118,7 @@ Each phase = one commit checkpoint. Phases build sequentially.
 | Phase | Tickets | What's working after commit |
 |-------|---------|---------------------------|
 | 1 | RD-01, 02, 03 | Contract reads work from frontend, types aligned, API client ready | ✅ |
-| 2 | RD-04, 05 | Data hooks fetch real on-chain data, backend can list escrows |
+| 2 | RD-04, 05 | Data hooks fetch real on-chain data, backend can list escrows | ✅ |
 | 3 | RD-06, 07, 08, 09 | All pages show real data (reads), no more mock data |
 | 4 | RD-10, 11, 12 | Full write flow — create escrows, fund, approve, dispute, claim, cancel |
 | 5 | RD-13 | Polished tx feedback with toasts and Etherscan links |

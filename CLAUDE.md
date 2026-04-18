@@ -22,7 +22,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Real Data Integration (Phase 1 of 5 DONE) — Frontend contract client, types, and API client built. Pages still use mock data. See `TICKETS_REAL_DATA.md` for remaining phases. Next: Phase 2 (Data hooks + backend endpoints).
+Real Data Integration (Phase 2 of 5 DONE) — Contract client, types, API client, data hooks, and backend endpoints built. Pages still use mock data. See `TICKETS_REAL_DATA.md` for remaining phases. Next: Phase 3 (Wire read pages — replace mock data).
 
 ## Frontend Structure
 ```

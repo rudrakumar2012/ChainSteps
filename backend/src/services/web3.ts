@@ -107,12 +107,59 @@ export async function claimMilestone(escrowId: number): Promise<void> {
   await tx.wait();
 }
 
+export async function cancelEscrow(escrowId: number): Promise<void> {
+  const contract = getContractWithSigner();
+  const tx = await contract.cancelEscrow(escrowId);
+  await tx.wait();
+}
+
+export async function getAllEscrows(address?: string): Promise<(Escrow & { id: number })[]> {
+  const contract = getContract();
+  const escrows: (Escrow & { id: number })[] = [];
+  let id = 0;
+  while (true) {
+    try {
+      const creator = await contract.escrowCreators(id);
+      if (creator === ethers.ZeroAddress) break;
+      const escrow = await contract.getEscrow(id);
+      const entry = {
+        id,
+        client: escrow[0],
+        freelancer: escrow[1],
+        state: Number(escrow[2]),
+        currentMilestone: Number(escrow[3]),
+        milestoneCount: Number(escrow[4]),
+        totalAmount: escrow[5].toString(),
+      };
+      if (!address || entry.client.toLowerCase() === address.toLowerCase() || entry.freelancer.toLowerCase() === address.toLowerCase()) {
+        escrows.push(entry);
+      }
+      id++;
+    } catch {
+      break;
+    }
+  }
+  return escrows;
+}
+
+export async function getAllMilestones(escrowId: number): Promise<Milestone[]> {
+  const escrow = await getEscrow(escrowId);
+  const milestones: Milestone[] = [];
+  for (let i = 0; i < escrow.milestoneCount; i++) {
+    const milestone = await getMilestone(escrowId, i);
+    milestones.push(milestone);
+  }
+  return milestones;
+}
+
 // Internal
 function getContract() {
   const abi = [
     "function getEscrow(uint256 _escrowId) external view returns (address client, address freelancer, uint8 state, uint256 currentMilestone, uint256 milestoneCount, uint256 totalAmount)",
     "function getMilestone(uint256 _escrowId, uint256 _milestoneId) external view returns (string description, uint256 amount, bool isCompleted, bool isApproved, uint256 completedAt, uint256 approvalTimeout)",
     "function getApprovalTimeout(uint256 _escrowId) external view returns (uint256)",
+    "function escrowCreators(uint256) external view returns (address)",
+    "function escrows(uint256) external view returns (address client, address freelancer, uint8 state, uint256 currentMilestone, uint256 disputeTimeout, address arbitrator, uint256 totalAmount)",
   ];
   return new ethers.Contract(config.contractAddress, abi, getProvider());
 }
@@ -127,6 +174,7 @@ function getContractWithSigner() {
     "function raiseDispute(uint256 _escrowId) external",
     "function resolveDispute(uint256 _escrowId, uint256 _clientPercent) external",
     "function claimMilestone(uint256 _escrowId) external",
+    "function cancelEscrow(uint256 _escrowId) external",
   ];
   return new ethers.Contract(config.contractAddress, abi, getWallet());
 }

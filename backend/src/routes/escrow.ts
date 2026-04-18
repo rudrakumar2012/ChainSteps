@@ -3,6 +3,8 @@ import {
   getEscrow,
   getMilestone,
   getApprovalTimeout,
+  getAllEscrows,
+  getAllMilestones,
   createEscrow,
   addMilestone,
   fundEscrow,
@@ -10,10 +12,24 @@ import {
   approveMilestone,
   raiseDispute,
   resolveDispute,
+  cancelEscrow,
+  claimMilestone,
 } from '../services/web3.js';
 import { uploadToIPFS } from '../services/ipfs.js';
 
 const router = Router();
+
+// GET /escrow - List all escrows (optional ?address= filter)
+router.get('/', async (req, res) => {
+  try {
+    const address = req.query.address as string | undefined;
+    const escrows = await getAllEscrows(address);
+    res.json(escrows);
+  } catch (error: any) {
+    console.error('Error listing escrows:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // GET /escrow/:id - Get escrow details
 router.get('/:id', async (req, res) => {
@@ -194,6 +210,51 @@ router.post('/:id/evidence', async (req, res) => {
     res.json({ cid });
   } catch (error: any) {
     console.error('Error uploading to IPFS:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /escrow/:id/milestones - Get all milestones for an escrow
+router.get('/:id/milestones', async (req, res) => {
+  try {
+    const escrowId = parseInt(req.params.id as string);
+    if (isNaN(escrowId)) {
+      return res.status(400).json({ error: 'Invalid escrow ID' });
+    }
+    const milestones = await getAllMilestones(escrowId);
+    res.json(milestones);
+  } catch (error: any) {
+    console.error('Error fetching milestones:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /escrow/:id/cancel - Cancel escrow (client only, Created state)
+router.post('/:id/cancel', async (req, res) => {
+  try {
+    const escrowId = parseInt(req.params.id as string);
+    if (isNaN(escrowId)) {
+      return res.status(400).json({ error: 'Invalid escrow ID' });
+    }
+    await cancelEscrow(escrowId);
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('Error cancelling escrow:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /escrow/:id/claim - Claim milestone after timeout
+router.post('/:id/claim', async (req, res) => {
+  try {
+    const escrowId = parseInt(req.params.id as string);
+    if (isNaN(escrowId)) {
+      return res.status(400).json({ error: 'Invalid escrow ID' });
+    }
+    await claimMilestone(escrowId);
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('Error claiming milestone:', error);
     res.status(500).json({ error: error.message });
   }
 });
