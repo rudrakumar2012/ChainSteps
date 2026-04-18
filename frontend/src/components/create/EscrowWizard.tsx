@@ -7,6 +7,7 @@ import { MilestonesStep } from "./MilestonesStep";
 import { ReviewStep } from "./ReviewStep";
 import { Button } from "../ui/Button";
 import { ProgressBar } from "../ui/ProgressBar";
+import { isValidAddress } from "@/lib/utils";
 
 interface EscrowWizardProps {
   clientAddress: string;
@@ -33,10 +34,6 @@ const initialFormData: CreateEscrowFormData = {
   arbitrator: "",
   milestones: [],
 };
-
-function isValidAddress(address: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
-}
 
 export function EscrowWizard({ clientAddress, onSubmit, onCancel }: EscrowWizardProps) {
   const [currentStep, setCurrentStep] = useState<Step>("parties");

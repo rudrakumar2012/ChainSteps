@@ -1,6 +1,7 @@
 import { Escrow, EscrowState } from "@/types";
 import { StatusBadge } from "../ui/StatusBadge";
 import { ProgressBar } from "../ui/ProgressBar";
+import { getEscrowStatus, truncateAddress, escrowProgress } from "@/lib/utils";
 
 interface ContractRowProps {
   escrow: Escrow;
@@ -8,26 +9,7 @@ interface ContractRowProps {
   onClick?: () => void;
 }
 
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-function getEscrowStatus(escrow: Escrow): "active" | "completed" | "pending" | "disputed" {
-  switch (escrow.state) {
-    case EscrowState.Active:
-      return "active";
-    case EscrowState.Completed:
-      return "completed";
-    case EscrowState.Disputed:
-      return "disputed";
-    case EscrowState.Created:
-      return "pending";
-    default:
-      return "pending";
-  }
-}
-
-function getRoleBadge(role: "client" | "freelancer") {
+function getRoleBadge(role: "client" | "freelancer" | "arbitrator") {
   return role === "client"
     ? { label: "Client", className: "bg-primary/10 text-primary border-primary/20" }
     : { label: "Freelancer", className: "bg-secondary/10 text-secondary border-secondary/20" };

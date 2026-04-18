@@ -1,5 +1,5 @@
 interface StatusBadgeProps {
-  status: "active" | "completed" | "pending" | "disputed" | "funded" | "unfunded";
+  status: "active" | "completed" | "pending" | "disputed" | "cancelled" | "funded" | "unfunded";
   label?: string;
 }
 
@@ -35,6 +35,14 @@ const statusConfig = {
     border: "border-error/20",
     shadow: "shadow-[0_0_5px_#ffb4ab]",
     label: "Disputed",
+  },
+  cancelled: {
+    bg: "bg-on-surface-variant/10",
+    text: "text-on-surface-variant",
+    dot: "bg-on-surface-variant",
+    border: "border-on-surface-variant/20",
+    shadow: "",
+    label: "Cancelled",
   },
   funded: {
     bg: "bg-outline-variant/10",

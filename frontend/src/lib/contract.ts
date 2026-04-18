@@ -6,7 +6,9 @@ import type { Escrow, Milestone, EscrowState } from "@/types";
 export const CONTRACT_ADDRESS = "0x7b2D41F3A7592c55CB73502ddECf8F84289e9021";
 
 export function getReadContract(): ethers.Contract {
-  const provider = getProvider();
+  const provider = typeof window !== "undefined" && window.ethereum
+    ? getProvider()
+    : getReadOnlyProvider();
   return new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
 }
 
@@ -17,19 +19,7 @@ export async function getWriteContract(): Promise<ethers.Contract> {
 }
 
 export async function fetchEscrow(id: number): Promise<Escrow> {
-  const contract = getReadContract();
-  const raw = await contract.getEscrow(id);
-  return {
-    id: String(id),
-    client: raw.client as string,
-    freelancer: raw.freelancer as string,
-    state: Number(raw.state) as EscrowState,
-    currentMilestone: Number(raw.currentMilestone),
-    milestoneCount: Number(raw.milestoneCount),
-    totalAmount: ethers.formatEther(raw.totalAmount),
-    arbitrator: ethers.ZeroAddress,
-    disputeTimeout: "0",
-  };
+  return fetchEscrowFull(id);
 }
 
 export async function fetchEscrowFull(id: number): Promise<Escrow> {

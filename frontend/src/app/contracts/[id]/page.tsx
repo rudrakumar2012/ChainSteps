@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrowDetail } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
 import { useTransactionContext } from "@/components/tx";
+import { truncateAddress } from "@/lib/utils";
 import {
   fundEscrowTx,
   completeMilestoneTx,
@@ -28,10 +29,6 @@ function getMilestoneState(milestone: Milestone, index: number, currentIndex: nu
   if (milestone.isCompleted) return "in_review";
   if (escrowState !== EscrowState.Created && index <= currentIndex) return "funded";
   return "unfunded";
-}
-
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 export default function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -346,18 +343,25 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
           )}
 
           {/* Claim Milestone (after timeout) */}
-          {escrow.state === EscrowState.Active && isFreelancer && milestones[escrow.currentMilestone]?.isCompleted && !milestones[escrow.currentMilestone]?.isApproved && (
+          {escrow.state === EscrowState.Active && isFreelancer && milestones[escrow.currentMilestone]?.isCompleted && !milestones[escrow.currentMilestone]?.isApproved && (() => {
+            const timeout = Number(milestones[escrow.currentMilestone]?.approvalTimeout || "0");
+            const canClaim = timeout > 0 && Date.now() / 1000 > timeout;
+            return (
             <div className="bg-surface-container rounded-xl p-6 border border-tertiary/20">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-sm font-bold text-white headline-font mb-1">Claim Milestone</h3>
                   <p className="text-xs text-on-surface-variant">
-                    If approval timeout has passed, you can claim the milestone.
+                    {canClaim
+                      ? "Approval timeout has passed. You can claim the milestone."
+                      : timeout > 0
+                        ? `Approval timeout expires ${new Date(timeout * 1000).toLocaleString()}.`
+                        : "Awaiting approval timeout."}
                   </p>
                 </div>
                 <button
                   onClick={() => handleAction("Claim", () => claimMilestoneTx(escrowIdNum))}
-                  disabled={!!pendingAction}
+                  disabled={!!pendingAction || !canClaim}
                   className="bg-tertiary text-on-tertiary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
                 >
                   {pendingAction === "Claim" ? (
@@ -369,7 +373,8 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                 </button>
               </div>
             </div>
-          )}
+            );
+          })()}
 
           {/* Resolve Dispute (arbitrator only) */}
           {escrow.state === EscrowState.Disputed && isArbitrator && (

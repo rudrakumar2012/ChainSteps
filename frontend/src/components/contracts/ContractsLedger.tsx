@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Escrow, EscrowFilter, EscrowState } from "@/types";
+import { Escrow, EscrowFilter } from "@/types";
 import { StatusBadge } from "../ui/StatusBadge";
+import { getEscrowStatus, truncateAddress } from "@/lib/utils";
 
 interface ContractsLedgerProps {
   escrows: Escrow[];
@@ -15,25 +16,6 @@ const filterOptions: { value: EscrowFilter; label: string }[] = [
   { value: "client", label: "As Client" },
   { value: "freelancer", label: "As Freelancer" },
 ];
-
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-function getEscrowStatus(escrow: Escrow): "active" | "completed" | "pending" | "disputed" {
-  switch (escrow.state) {
-    case EscrowState.Active:
-      return "active";
-    case EscrowState.Completed:
-      return "completed";
-    case EscrowState.Disputed:
-      return "disputed";
-    case EscrowState.Created:
-      return "pending";
-    default:
-      return "pending";
-  }
-}
 
 export function ContractsLedger({
   escrows,

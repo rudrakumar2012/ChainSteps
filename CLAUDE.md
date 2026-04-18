@@ -22,7 +22,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-All 5 phases complete. Transaction toast notifications (Phase 5) implemented — global TransactionProvider tracks tx lifecycle with glass-morphism toasts and Etherscan links.
+Fullstack audit in progress. Phases A (Crash Bugs) and B (Data Correctness) complete. Phase C (UX/Accessibility), D (Code Quality), and E (Backend Cleanup) remain. See `AUDIT_FIX_PLAN.md` for details.
 
 ## Frontend Structure
 ```
@@ -45,7 +45,7 @@ frontend/
 │   ├── components/
 │   │   ├── ui/             # GlassCard, Button, StatusBadge, ProgressBar
 │   │   ├── layout/         # Sidebar, TopBar, AppShell (with WalletProvider)
-│   │   ├── homepage/       # HomeHeader, Hero, FeatureGrid, HowItWorks, TrustIndicators
+│   │   ├── homepage/       # HomeHeader, Hero, FeatureGrid, HowItWorks, TrustIndicators, BlockchainCube
 │   │   ├── dashboard/      # Dashboard, StatsCard
 │   │   ├── contracts/      # ContractRow, ContractsGrid, ContractsLedger, ContractDetail, CreateNewCard
 │   │   ├── create/         # EscrowWizard, PartiesStep, MilestonesStep, ReviewStep
@@ -53,8 +53,8 @@ frontend/
 │   │   ├── evidence/        # EvidencePanel
 │   │   ├── tx/             # TransactionProvider, TransactionToast, ToastContainer
 │   │   └── wallet/         # WalletProvider, ConnectButton
-│   ├── hooks/              # useWallet, useEscrows, useEscrowDetail, useDashboard
-│   ├── lib/                # provider.ts, contract.ts (TxHandle), api.ts, abi.json
+│   ├── hooks/              # useWallet, useEscrows, useEscrowDetail, useDashboard, useHomepageStats
+│   ├── lib/                # provider.ts, contract.ts (TxHandle), api.ts, abi.json, utils.ts
 │   └── types/              # Escrow, Milestone, EscrowState, TransactionStatus, Dispute
 ```
 
@@ -62,7 +62,8 @@ frontend/
 - "The Architectural Ledger" - dark fintech theme
 - Surface: #0b1326, Primary: #4cd7f6, Secondary: #4edea3
 - Typography: Space Grotesk (headlines), Inter (body)
-- See `TICKETS_REAL_DATA.md` for pending work
+- See `AUDIT_FIX_PLAN.md` for active audit work
+- See `TICKETS_REAL_DATA.md` for completed real-data integration phases
 
 ## Backend Structure
 ```

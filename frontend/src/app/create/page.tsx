@@ -10,6 +10,7 @@ import { CreateEscrowFormData } from "@/types";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
 import { useTransactionContext } from "@/components/tx";
 import { createEscrowTx, addMilestoneTx, fundEscrowTx } from "@/lib/contract";
+import { isValidAddress } from "@/lib/utils";
 import { ethers } from "ethers";
 
 type Step = "parties" | "milestones" | "review";
@@ -27,10 +28,6 @@ const initialFormData: CreateEscrowFormData = {
   arbitrator: "",
   milestones: [],
 };
-
-function isValidAddress(address: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
-}
 
 export default function CreateEscrowPage() {
   const router = useRouter();

@@ -1,15 +1,11 @@
 "use client";
 
 import { CreateEscrowFormData } from "@/types";
+import { truncateAddress } from "@/lib/utils";
 
 interface ReviewStepProps {
   formData: CreateEscrowFormData;
   clientAddress: string;
-}
-
-function truncateAddress(address: string): string {
-  if (!address) return "—";
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 export function ReviewStep({ formData, clientAddress }: ReviewStepProps) {

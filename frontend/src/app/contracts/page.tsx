@@ -7,22 +7,13 @@ import { Escrow, EscrowState, EscrowFilter } from "@/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrows } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
+import { getEscrowStatus, truncateAddress } from "@/lib/utils";
 
 const filterOptions: { value: EscrowFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "client", label: "As Client" },
   { value: "freelancer", label: "As Freelancer" },
 ];
-
-function getEscrowStatus(escrow: Escrow): "active" | "completed" | "pending" | "disputed" {
-  switch (escrow.state) {
-    case EscrowState.Active: return "active";
-    case EscrowState.Completed: return "completed";
-    case EscrowState.Disputed: return "disputed";
-    case EscrowState.Created: return "pending";
-    default: return "pending";
-  }
-}
 
 function getPhaseLabel(escrow: Escrow): string {
   if (escrow.state === EscrowState.Completed) return "Final Milestone";

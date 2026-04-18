@@ -35,7 +35,7 @@ export function useHomepageStats() {
       return sum;
     }, 0);
     const totalMilestones = escrows.reduce((sum, e) => sum + e.milestoneCount, 0);
-    const completedMilestones = escrows.reduce((sum, e) => sum + e.currentMilestone, 0);
+    const completedMilestones = completed.reduce((sum, e) => sum + e.milestoneCount, 0);
     const milestoneCompletionRate = totalMilestones > 0
       ? ((completedMilestones / totalMilestones) * 100).toFixed(1)
       : "0.0";

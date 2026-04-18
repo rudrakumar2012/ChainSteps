@@ -7,58 +7,58 @@ A comprehensive audit of the smart contract, backend, and frontend revealed 6 Cr
 
 ---
 
-## Phase A: Crash Bugs (Critical)
+## Phase A: Crash Bugs (Critical) ✅ DONE
 
-### A1. Fix Rules of Hooks violation in contract detail page
+### A1. Fix Rules of Hooks violation in contract detail page ✅
 **File:** `frontend/src/app/contracts/[id]/page.tsx`
 **Problem:** `useState` hooks (lines 73-74) are called after conditional early returns (lines 44, 56). This violates React's Rules of Hooks and will crash React when the component transitions from loading to loaded.
 **Fix:** Move ALL `useState` hooks to the TOP of the component, before any conditional returns. Move `isArbitrator`, `isClient`, `isFreelancer` derivations after the hooks but before early returns (or compute them conditionally).
 
-### A2. Fix undefined variables in disputes page
+### A2. Fix undefined variables in disputes page ✅
 **File:** `frontend/src/app/disputes/page.tsx`
 **Problem:** Lines ~249-268 reference `clientPercent`, `setClientPercent`, and `resolveError` which don't exist. The component has `clientPercents` (Record), `setClientPercents`, and `resolveErrors` (Record).
 **Fix:** Replace `clientPercent` -> `getClientPercent(dispute.escrowId)`, `setClientPercent(...)` -> `setClientPercents(prev => ({...prev, [dispute.escrowId]: value}))`, `resolveError` -> `resolveErrors[dispute.escrowId]`.
 
-### A3. Fix stale provider on chain switch
+### A3. Fix stale provider on chain switch ✅
 **File:** `frontend/src/hooks/useWallet.ts`, `frontend/src/lib/provider.ts`
 **Problem:** When user switches chains in MetaMask, `handleChainChanged` updates `chainId` but never calls `resetProvider()`. The cached `BrowserProvider` still targets the old network.
 **Fix:** Call `resetProvider()` inside `handleChainChanged` handler. Also call it in `disconnect()`.
 
 ---
 
-## Phase B: Data Correctness (High)
+## Phase B: Data Correctness (High) ✅ DONE
 
-### B1. Fix Sepolia RPC URL
+### B1. Fix Sepolia RPC URL ✅
 **File:** `frontend/src/lib/provider.ts:19`
 **Problem:** Fallback `https://rpc.sepolia.org` is not a valid public RPC. Also in `useWallet.ts:138`, Infura URL has no API key.
 **Fix:** Use a reliable public Sepolia RPC (e.g., `https://ethereum-sepolia-rpc.publicnode.com`). Update the `wallet_addEthereumChain` RPC URL to match.
 
-### B2. Fix `getReadContract` requiring wallet
+### B2. Fix `getReadContract` requiring wallet ✅
 **File:** `frontend/src/lib/contract.ts:8-11`
 **Problem:** `getReadContract()` calls `getProvider()` which requires `window.ethereum`. All read operations fail without a connected wallet.
 **Fix:** Make `getReadContract()` fall back to `getReadOnlyProvider()` when `window.ethereum` is unavailable. Or refactor all hooks to use the read-only provider for reads and only use the wallet provider for writes.
 
-### B3. Fix `fetchEscrow` hardcoded ZeroAddress
+### B3. Fix `fetchEscrow` hardcoded ZeroAddress ✅
 **File:** `frontend/src/lib/contract.ts:30-31`
 **Problem:** `fetchEscrow()` hardcodes `arbitrator: ethers.ZeroAddress` and `disputeTimeout: "0"` instead of reading from the contract.
 **Fix:** Update `fetchEscrow` to call both `contract.getEscrow(id)` and `contract.escrows(id)` to get all fields (like `fetchEscrowFull` does). Or remove `fetchEscrow` and use only `fetchEscrowFull`.
 
-### B4. Add `Cancelled` state to `getEscrowStatus` + `StatusBadge`
+### B4. Add `Cancelled` state to `getEscrowStatus` + `StatusBadge` ✅
 **Files:** `frontend/src/app/contracts/page.tsx`, `frontend/src/components/contracts/ContractRow.tsx`, `frontend/src/components/contracts/ContractsLedger.tsx`, `frontend/src/components/contracts/ContractDetail.tsx`, `frontend/src/components/ui/StatusBadge.tsx`
 **Problem:** `EscrowState.Cancelled` (4) falls through to `default: "pending"` in all 4+ `getEscrowStatus` implementations. Cancelled escrows show as "Pending".
 **Fix:** Add "cancelled" case to all `getEscrowStatus` functions and `StatusBadge` component. Extract to a single shared function in `lib/utils.ts` to eliminate duplication.
 
-### B5. Fix `milestoneCompletionRate` overcounting
+### B5. Fix `milestoneCompletionRate` overcounting ✅
 **Files:** `frontend/src/hooks/useDashboard.ts:29`, `frontend/src/hooks/useHomepageStats.ts:38`
 **Problem:** `completedMilestones` uses `e.currentMilestone` which is an index, not a count of approved milestones. For disputed/cancelled escrows this is wrong.
 **Fix:** Only count completed milestones for `Completed` state escrows (where all milestones are done). Or skip the rate for non-active/completed escrows.
 
-### B6. Fix `getDisputeStatus` always returning "under_review"
+### B6. Fix `getDisputeStatus` always returning "under_review" ✅
 **File:** `frontend/src/app/disputes/page.tsx:35-37`
 **Problem:** The function always returns `"under_review"`, making the Resolved filter useless.
 **Fix:** Check if the escrow state is `Completed` after dispute resolution (state returns to Active then can proceed to Completed). Since the contract doesn't have an explicit "dispute resolved" flag, use escrow state: if escrow was disputed but is now Active or Completed, the dispute is resolved.
 
-### B7. Fix claim milestone button — no timeout check
+### B7. Fix claim milestone button — no timeout check ✅
 **File:** `frontend/src/app/contracts/[id]/page.tsx:330`
 **Problem:** Claim button shows whenever milestone is completed+unapproved, but on-chain `claimMilestone` reverts if timeout hasn't passed. User gets confusing error.
 **Fix:** Compare `milestone.approvalTimeout` (Unix timestamp) against current time. Disable the button and show a countdown if timeout hasn't passed.
@@ -90,7 +90,7 @@ A comprehensive audit of the smart contract, backend, and frontend revealed 6 Cr
 **Files:** `frontend/src/components/create/PartiesStep.tsx`, `frontend/src/components/create/EscrowWizard.tsx`
 **Fix:** Validate freelancer != connected address. Show error if same.
 
-### C6. Fix cancel button — add confirmation
+### C6. Fix cancel button — add confirmation ✅ (done in Phase A)
 **File:** `frontend/src/app/contracts/[id]/page.tsx:317-327`
 **Fix:** Add a `window.confirm("Are you sure? ...")` or inline confirmation step before cancelling.
 
@@ -115,7 +115,7 @@ A comprehensive audit of the smart contract, backend, and frontend revealed 6 Cr
 
 ## Phase D: Code Quality & DRY (Low)
 
-### D1. Extract shared utilities
+### D1. Extract shared utilities ✅ (done in Phase B — lib/utils.ts created)
 - `truncateAddress()` (defined 7+ times) -> `frontend/src/lib/utils.ts`
 - `getEscrowStatus()` (defined 4+ times) -> `frontend/src/lib/utils.ts`
 - `isValidAddress()` (defined 3 times) -> `frontend/src/lib/utils.ts`
@@ -132,7 +132,7 @@ A comprehensive audit of the smart contract, backend, and frontend revealed 6 Cr
 **File:** `frontend/src/components/wallet/WalletProvider.tsx:23-28`
 **Fix:** Remove `(window as any).__walletDebug = wallet`.
 
-### D5. Fix `buildDisputess` typo
+### D5. Fix `buildDisputess` typo ✅ (fixed in Phase B — renamed to buildDisputes)
 **File:** `frontend/src/app/disputes/page.tsx:21`
 **Fix:** Rename to `buildDisputes`.
 

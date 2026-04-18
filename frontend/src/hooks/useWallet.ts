@@ -136,7 +136,7 @@ export function useWallet() {
                   chainId: `0x${SEPOLIA_CHAIN_ID.toString(16)}`,
                   chainName: "Sepolia Testnet",
                   nativeCurrency: { name: "SepoliaETH", symbol: "SepoliaETH", decimals: 18 },
-                  rpcUrls: ["https://sepolia.infura.io/v3/"],
+                  rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
                   blockExplorerUrls: ["https://sepolia.etherscan.io"],
                 },
               ],

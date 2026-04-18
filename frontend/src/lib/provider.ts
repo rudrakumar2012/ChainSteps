@@ -16,7 +16,7 @@ export function resetProvider(): void {
   provider = null;
 }
 
-const SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
+const SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com";
 
 let readOnlyProvider: ethers.JsonRpcProvider | null = null;
 

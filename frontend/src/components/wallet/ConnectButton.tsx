@@ -3,10 +3,7 @@
 import { useRef, useEffect } from "react";
 import { useWalletContext } from "./WalletProvider";
 import { Button } from "../ui/Button";
-
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
+import { truncateAddress } from "@/lib/utils";
 
 export function ConnectButton({
   location = "unknown",

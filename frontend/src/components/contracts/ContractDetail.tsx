@@ -4,6 +4,7 @@ import { Escrow, EscrowState, Milestone } from "@/types";
 import { StatusBadge } from "../ui/StatusBadge";
 import { ProgressBar } from "../ui/ProgressBar";
 import { Button } from "../ui/Button";
+import { getEscrowStatus, truncateAddress } from "@/lib/utils";
 
 interface ContractDetailProps {
   escrow: Escrow;
@@ -14,25 +15,6 @@ interface ContractDetailProps {
   onCompleteMilestone?: (escrowId: string, milestoneIndex: number) => void;
   onApproveMilestone?: (escrowId: string, milestoneIndex: number) => void;
   onDispute?: (escrowId: string) => void;
-}
-
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-function getEscrowStatus(escrow: Escrow): "active" | "completed" | "pending" | "disputed" {
-  switch (escrow.state) {
-    case EscrowState.Active:
-      return "active";
-    case EscrowState.Completed:
-      return "completed";
-    case EscrowState.Disputed:
-      return "disputed";
-    case EscrowState.Created:
-      return "pending";
-    default:
-      return "pending";
-  }
 }
 
 function getMilestoneStatus(milestone: Milestone): "funded" | "unfunded" | "completed" {

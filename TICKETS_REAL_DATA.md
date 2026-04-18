@@ -124,3 +124,8 @@ Each phase = one commit checkpoint. Phases build sequentially.
 | 3 | RD-06, 07, 08, 09 | All pages show real data (reads), no more mock data | ✅ |
 | 4 | RD-10, 11, 12 | Full write flow — create escrows, fund, approve, dispute, claim, cancel | ✅ |
 | 5 | RD-13 | Polished tx feedback with toasts and Etherscan links | ✅ |
+| Audit A | Crash bugs | Rules of Hooks fix, disputes undefined vars, provider reset | ✅ |
+| Audit B | Data correctness | RPC URL fix, read-only fallback, Cancelled state, dispute status, claim timeout | ✅ |
+| Audit C | UX/Accessibility | Keyboard a11y, file validation, wallet guard, etc. | 🔲 |
+| Audit D | Code quality | DRY utilities, debug cleanup, typo fixes | 🔲 |
+| Audit E | Backend cleanup | Deprecate write routes, IPFS fix, validation | 🔲 |

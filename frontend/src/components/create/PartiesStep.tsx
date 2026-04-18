@@ -1,15 +1,12 @@
 "use client";
 
 import { CreateEscrowFormData } from "@/types";
+import { isValidAddress } from "@/lib/utils";
 
 interface PartiesStepProps {
   formData: CreateEscrowFormData;
   onUpdate: (data: Partial<CreateEscrowFormData>) => void;
   errors: Record<string, string>;
-}
-
-function isValidAddress(address: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
 
 export function PartiesStep({ formData, onUpdate, errors }: PartiesStepProps) {

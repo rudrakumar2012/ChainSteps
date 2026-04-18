@@ -9,6 +9,7 @@ import { useWalletContext } from "@/components/wallet/WalletProvider";
 import { useTransactionContext } from "@/components/tx";
 import { EscrowState, Dispute } from "@/types";
 import { resolveDisputeTx } from "@/lib/contract";
+import { truncateAddress } from "@/lib/utils";
 
 type DisputeStatus = "under_review" | "resolved";
 
@@ -18,9 +19,10 @@ const filterOptions: { value: "all" | DisputeStatus; label: string }[] = [
   { value: "resolved", label: "Resolved" },
 ];
 
-function buildDisputess(escrows: { id: string; client: string; freelancer: string; state: EscrowState; currentMilestone: number; disputeTimeout: string; arbitrator: string }[]): Dispute[] {
+function buildDisputes(escrows: { id: string; client: string; freelancer: string; state: EscrowState; currentMilestone: number; disputeTimeout: string; arbitrator: string }[]): (Dispute & { escrowState: EscrowState })[] {
   return escrows
-    .filter((e) => e.state === EscrowState.Disputed)
+    .filter((e) => e.state === EscrowState.Disputed || e.state === EscrowState.Active || e.state === EscrowState.Completed)
+    .filter((e) => e.state === EscrowState.Disputed || e.currentMilestone > 0)
     .map((e) => ({
       escrowId: e.id,
       client: e.client,
@@ -29,10 +31,14 @@ function buildDisputess(escrows: { id: string; client: string; freelancer: strin
       milestoneDescription: `Milestone #${e.currentMilestone}`,
       disputeTimeout: e.disputeTimeout,
       arbitrator: e.arbitrator,
+      escrowState: e.state,
     }));
 }
 
-function getDisputeStatus(dispute: Dispute): DisputeStatus {
+function getDisputeStatus(dispute: { escrowState: EscrowState }): DisputeStatus {
+  if (dispute.escrowState === EscrowState.Active || dispute.escrowState === EscrowState.Completed) {
+    return "resolved";
+  }
   return "under_review";
 }
 
@@ -54,10 +60,6 @@ function getStatusIcon(status: DisputeStatus) {
   }
 }
 
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
 export default function DisputesPage() {
   const router = useRouter();
   const { address, isConnected } = useWalletContext();
@@ -68,7 +70,7 @@ export default function DisputesPage() {
   const [resolveErrors, setResolveErrors] = useState<Record<string, string | null>>({});
   const [clientPercents, setClientPercents] = useState<Record<string, number>>({});
 
-  const disputes = buildDisputess(escrows);
+  const disputes = buildDisputes(escrows);
   const filtered = disputes.filter((d) => {
     if (activeFilter === "all") return true;
     return getDisputeStatus(d) === activeFilter;
