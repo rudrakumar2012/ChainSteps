@@ -31,21 +31,30 @@
 
 ## Implementation Steps
 
-### Step 1: Create Web3 Client Layer
-**Files**: `frontend/src/lib/contract.ts`, `frontend/src/lib/provider.ts`
+### ~~Step 1: Create Web3 Client Layer~~ ✅ DONE
+**Files**: `frontend/src/lib/contract.ts`, `frontend/src/lib/provider.ts`, `frontend/src/lib/abi.json`
 
-- Initialize ethers `BrowserProvider` from `window.ethereum`
-- Load contract ABI from compiled artifacts
-- Create typed contract instance with the deployed address
-- Export helper functions for reads and writes
+- ✅ Initialize ethers `BrowserProvider` from `window.ethereum`
+- ✅ Load contract ABI from compiled artifacts
+- ✅ Create typed contract instance with the deployed address
+- ✅ Export helper functions: `fetchEscrow`, `fetchEscrowFull`, `fetchMilestone`, `fetchAllMilestones`, `fetchAllEscrows`, `fetchEscrowsByAddress`, `getReadContract`, `getWriteContract`
 
-### Step 2: Create API Client for Backend
+### ~~Step 2: Create API Client for Backend~~ ✅ DONE
 **File**: `frontend/src/lib/api.ts`
 
-- Simple fetch wrapper for backend endpoints
-- Base URL from env (`NEXT_PUBLIC_API_URL`, default `http://localhost:3001`)
-- Error handling with typed responses
-- Only for: IPFS evidence upload, notifications (future), health check
+- ✅ Simple fetch wrapper for backend endpoints
+- ✅ Base URL from env (`NEXT_PUBLIC_API_URL`, default `http://localhost:3001`)
+- ✅ Error handling with typed responses
+- ✅ Endpoints: IPFS evidence upload, health check
+
+### ~~Step 7: Update Frontend Types~~ ✅ DONE (moved up — needed by Steps 1–2)
+**File**: `frontend/src/types/index.ts`
+
+- ✅ Add `Dispute` type (derived from disputed escrows)
+- ✅ Add `TransactionStatus` type for pending tx tracking
+- ✅ Add `TransactionState` type
+- ✅ Align `state` field with contract's `State` enum values
+- ✅ Add `arbitrator` and `disputeTimeout` fields to `Escrow` type
 
 ### Step 3: Create Data Hooks
 **Files**: `frontend/src/hooks/useEscrows.ts`, `frontend/src/hooks/useEscrowDetail.ts`, `frontend/src/hooks/useDashboard.ts`
@@ -94,14 +103,6 @@ Replace mock data in each page with hooks:
 
 Each write: show MetaMask confirm → wait for tx receipt → refresh data → toast notification
 
-### Step 7: Update Frontend Types
-**File**: `frontend/src/types/index.ts`
-
-- Add `Dispute` type (derived from disputed escrows)
-- Add `EscrowListItem` type with resolved project metadata
-- Add `TransactionStatus` type for pending tx tracking
-- Align `state` field with contract's `State` enum values
-
 ### Step 8: Add Transaction UI Feedback
 **Files**: New component `frontend/src/components/ui/TransactionToast.tsx`
 
@@ -114,29 +115,36 @@ Each write: show MetaMask confirm → wait for tx receipt → refresh data → t
 
 ## Implementation Order
 
-1. **Step 1** — Contract client layer (foundation)
-2. **Step 2** — API client (simple, needed for IPFS)
-3. **Step 3** — Data hooks (core data layer)
-4. **Step 4** — Backend endpoint additions (enables escrow listing)
-5. **Step 5** — Wire pages to hooks (replace mock data)
-6. **Step 6** — Wire write operations (MetaMask transactions)
-7. **Step 7** — Update types (cleanup)
+1. ~~**Step 1** — Contract client layer (foundation)~~ ✅
+2. ~~**Step 2** — API client (simple, needed for IPFS)~~ ✅
+3. ~~**Step 7** — Update types (moved up, needed by Steps 1–2)~~ ✅
+4. **Step 3** — Data hooks (core data layer) ← NEXT
+5. **Step 4** — Backend endpoint additions (enables escrow listing)
+6. **Step 5** — Wire pages to hooks (replace mock data)
+7. **Step 6** — Wire write operations (MetaMask transactions)
 8. **Step 8** — Transaction feedback (UX polish)
 
 ---
 
 ## Files to Create/Modify
 
-### New Files
-- `frontend/src/lib/contract.ts` — Contract ABI, address, typed instance
+### ✅ Created (Phase 1)
+- `frontend/src/lib/contract.ts` — Contract ABI, address, typed read/write helpers
+- `frontend/src/lib/provider.ts` — BrowserProvider singleton
+- `frontend/src/lib/abi.json` — Contract ABI JSON
 - `frontend/src/lib/api.ts` — Backend API client
+- `TICKETS_REAL_DATA.md` — Phased ticket breakdown
+
+### ✅ Modified (Phase 1)
+- `frontend/src/types/index.ts` — Added arbitrator, disputeTimeout, TransactionStatus, Dispute
+
+### New Files (Remaining)
 - `frontend/src/hooks/useEscrows.ts` — List escrows hook
 - `frontend/src/hooks/useEscrowDetail.ts` — Single escrow + milestones hook
 - `frontend/src/hooks/useDashboard.ts` — Dashboard stats hook
 - `frontend/src/components/ui/TransactionToast.tsx` — Tx feedback UI
 
-### Modified Files
-- `frontend/src/types/index.ts` — Updated types
+### Modified Files (Remaining)
 - `frontend/src/app/dashboard/page.tsx` — Replace mock data
 - `frontend/src/app/contracts/page.tsx` — Replace mock data
 - `frontend/src/app/contracts/[id]/page.tsx` — Replace mock data
