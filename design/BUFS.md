@@ -179,7 +179,7 @@
 - **Issue:** Page linked in Sidebar but doesn't exist
 - **Design Reference:** NONE - needs conceptual design
 - **File:** `frontend/src/app/disputes/page.tsx`
-- **Status:** MISSING - Needs Implementation
+- **Status:** ✅ DONE
 - **Proposed Components:**
   - Header: "Dispute Resolution"
   - List of contracts in dispute status
@@ -216,10 +216,8 @@
 **TICKET-009: "Mark Complete" Button Does Nothing**
 - **Issue:** MilestoneTimeline's "Mark Complete" button has no `onClick` handler
 - **File:** `frontend/src/components/milestone/MilestoneTimeline.tsx:148`
-- **Status:** To Fix (unblocked — TICKET-004 is done)
-- **Design Reference:** `design/milestone_details/code.html:214-221` shows client action buttons (Approve & Pay, Initiate Dispute)
-- **Fix:** Add `onClick={() => onApprove?.(index)}` similar to the approve button. For freelancer role, add "Mark Complete" handler.
-- **Note:** `currentAddress` prop is accepted but never used - could determine button visibility based on wallet address
+- **Status:** ✅ DONE
+- **Fix:** Added `onComplete` callback prop and wired it to the "Mark Complete" button's `onClick`.
 
 **TICKET-010: handleContractClick is Incomplete TODO**
 - **Issue:** Contract click handler only logs to console, doesn't navigate
@@ -245,14 +243,14 @@
 **TICKET-013: Dynamic Border Classes in StatusBadge Won't Work**
 - **Issue:** `border-${status}/20` generates invalid Tailwind classes (e.g., `border-active/20`)
 - **File:** `frontend/src/components/ui/StatusBadge.tsx:50`
-- **Status:** To Fix
-- **Fix:** Use specific static classes per status: `border-primary/20` for active, `border-secondary/20` for completed, etc.
+- **Status:** ✅ DONE
+- **Fix:** Replaced with explicit static `border` classes per status (e.g., `border-primary/20`, `border-secondary/20`).
 
 **TICKET-014: Dynamic Shadow Classes in StatusBadge Won't Work**
 - **Issue:** `shadow-[0_0_5px_${config.dot.replace("bg-", "")}]` - Tailwind can't generate these at runtime
 - **File:** `frontend/src/components/ui/StatusBadge.tsx:52`
-- **Status:** To Fix
-- **Fix:** Remove dynamic shadow or use inline style with computed value
+- **Status:** ✅ DONE
+- **Fix:** Replaced with explicit static `shadow` values per status (e.g., `shadow-[0_0_5px_#4cd7f6]`). Also updated funded/unfunded colors from hardcoded slate to design system colors.
 
 ### MOBILE RESPONSIVENESS (MEDIUM PRIORITY)
 
@@ -260,20 +258,20 @@
 - **Issue:** Sidebar uses fixed positioning with no hamburger menu or slide-out drawer for mobile
 - **File:** `frontend/src/components/layout/Sidebar.tsx:19`
 - **Design Reference:** `design/create_new_escrow/code.html:335-343` shows mobile bottom navigation with floating center "+" button
-- **Status:** To Fix
-- **Fix:** Add state for mobile sidebar open/closed, hamburger menu button in TopBar, responsive behavior
+- **Status:** ✅ DONE
+- **Fix:** Added mobile drawer with overlay, hamburger menu button in TopBar, responsive `lg:translate-x-0` / `-translate-x-full` toggle, auto-close on nav click.
 
 **TICKET-016: TopBar Width Calculation Breaks on Mobile**
 - **Issue:** `w-[calc(100%-16rem)]` assumes sidebar always visible
 - **File:** `frontend/src/components/layout/TopBar.tsx:11`
-- **Status:** To Fix
-- **Fix:** Use responsive classes - full width on mobile, calc width only on lg+
+- **Status:** ✅ DONE
+- **Fix:** Replaced with `left-0 right-0 lg:left-64` — full width on mobile, offset on desktop.
 
 **TICKET-017: Main Content Area Not Mobile Responsive**
 - **Issue:** `ml-64` fixed margin doesn't work on mobile screens
 - **File:** `frontend/src/components/layout/AppShell.tsx:16`
-- **Status:** To Fix
-- **Fix:** Use responsive margins - `ml-0` on mobile, `ml-64` on lg+
+- **Status:** ✅ DONE
+- **Fix:** Changed to `ml-0 lg:ml-64` with responsive padding.
 
 ### DESIGN SYSTEM COMPLIANCE (MEDIUM PRIORITY)
 
@@ -369,12 +367,12 @@
 | 5 | TICKET-003 | Create /contracts page | ✅ DONE |
 | 6 | TICKET-005 | Create /create page | ✅ DONE |
 | 7 | TICKET-004 | Create /contracts/[id] page | ✅ DONE |
-| 8 | TICKET-006 | Create /disputes page | None |
+| 8 | TICKET-006 | Create /disputes page | ✅ DONE |
 
 ### Phase 3: Fix Broken Interactions
 | Order | Ticket | Title | Blocking |
 |-------|--------|-------|----------|
-| 9 | TICKET-009 | Fix "Mark Complete" button | None |
+| 9 | TICKET-009 | Fix "Mark Complete" button | ✅ DONE |
 | 10 | TICKET-010 | Fix handleContractClick navigation | ✅ DONE (unblocked by TICKET-004) |
 | 11 | TICKET-011 | Fix Sidebar wallet click | ✅ DONE |
 
@@ -382,11 +380,11 @@
 | Order | Ticket | Title | Blocking |
 |-------|--------|-------|----------|
 | 12 | TICKET-012 | Fix TopBar dynamic shadow | ✅ DONE |
-| 13 | TICKET-013 | Fix StatusBadge dynamic borders | None |
-| 14 | TICKET-014 | Fix StatusBadge dynamic shadows | None |
-| 15 | TICKET-015 | Add mobile sidebar | None |
-| 16 | TICKET-016 | Fix TopBar mobile width | TICKET-015 |
-| 17 | TICKET-017 | Fix AppShell mobile margin | TICKET-015 |
+| 13 | TICKET-013 | Fix StatusBadge dynamic borders | ✅ DONE |
+| 14 | TICKET-014 | Fix StatusBadge dynamic shadows | ✅ DONE |
+| 15 | TICKET-015 | Add mobile sidebar | ✅ DONE |
+| 16 | TICKET-016 | Fix TopBar mobile width | ✅ DONE |
+| 17 | TICKET-017 | Fix AppShell mobile margin | ✅ DONE |
 
 ### Phase 5: Design System Compliance
 | Order | Ticket | Title | Blocking |

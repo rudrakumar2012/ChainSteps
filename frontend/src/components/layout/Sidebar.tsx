@@ -17,7 +17,7 @@ const navItems: NavItem[] = [
   { label: "Dispute Resolution", icon: "gavel", href: "/disputes" },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
@@ -54,6 +54,7 @@ export function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavClick}
             className={`
               flex items-center gap-4 px-6 py-3
               text-sm tracking-tight

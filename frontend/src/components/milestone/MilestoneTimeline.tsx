@@ -7,6 +7,7 @@ interface MilestoneTimelineProps {
   milestones: Milestone[];
   currentIndex: number;
   onApprove?: (index: number) => void;
+  onComplete?: (index: number) => void;
   onDispute?: (index: number) => void;
   currentAddress?: string | null;
   isClient?: boolean;
@@ -58,6 +59,7 @@ export function MilestoneTimeline({
   milestones,
   currentIndex,
   onApprove,
+  onComplete,
   onDispute,
   isClient,
   isFreelancer,
@@ -145,7 +147,7 @@ export function MilestoneTimeline({
                 {isCurrentMilestone && state !== "completed" && (
                   <div className="flex flex-wrap gap-2 pt-3 border-t border-white/10">
                     {isFreelancer && state !== "in_review" && (
-                      <Button variant="secondary" size="sm">
+                      <Button variant="secondary" size="sm" onClick={() => onComplete?.(index)}>
                         <span className="material-symbols-outlined text-sm">check_circle</span>
                         Mark Complete
                       </Button>

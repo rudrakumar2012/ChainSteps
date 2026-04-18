@@ -80,7 +80,7 @@
 - [x] /contracts (My Contracts / Ledger) page with filter tabs, metric cards, table, pagination
 - [x] /contracts/[id] (Contract Detail) page with milestone timeline, evidence panel, participants
 - [x] /create (New Escrow) page with vertical stepper layout, summary card, deploy button
-- [ ] /disputes page (TICKET-006 — still missing)
+- [x] /disputes page with dispute cards, filter tabs, resolution history
 
 ### Phase 5 (Week 13-14): Testing
 - [ ] E2E testing
@@ -98,11 +98,15 @@
 ✅ Doc: Full report + UML diagrams
 
 ## Current Progress
-**Phase 4E Complete** — All core frontend pages implemented:
+**Phase 4E Complete** — All core frontend pages and UX fixes implemented:
 - `/contracts` — Ledger page with filter tabs, metric cards, contract table, pagination
 - `/contracts/[id]` — Contract detail with vertical milestone timeline, evidence panel, participants sidebar
 - `/create` — New escrow wizard with vertical stepper layout, summary card, deploy button
-- Dashboard contract clicks now navigate to `/contracts/[id]`
-- Homepage Connect Wallet now redirects to dashboard on connect
-- Remaining: `/disputes` page (TICKET-006), layout bugs, mobile responsiveness, design compliance
+- `/disputes` — Dispute resolution page with cards, filter tabs, resolution history
+- Dashboard contract clicks navigate to `/contracts/[id]`
+- Homepage Connect Wallet redirects to dashboard on connect
+- "Mark Complete" button now has onClick handler (onComplete callback)
+- StatusBadge uses static Tailwind classes (no more dynamic class generation)
+- Mobile responsive: hamburger menu, slide-out sidebar, responsive TopBar and content margins
+- Remaining: design compliance (018-020), code quality (021-024)
 - Sepolia testnet contract: 0x7b2D41F3A7592c55CB73502ddECf8F84289e9021
