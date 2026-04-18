@@ -22,7 +22,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Real Data Integration (Phase 2 of 5 DONE) — Contract client, types, API client, data hooks, and backend endpoints built. Pages still use mock data. See `TICKETS_REAL_DATA.md` for remaining phases. Next: Phase 3 (Wire read pages — replace mock data).
+Real Data Integration (Phase 3 of 5 DONE) — All pages now read from on-chain data via hooks. No more mock data. Write operations still use stubs. See `TICKETS_REAL_DATA.md` for remaining phases. Next: Phase 4 (Wire write operations — MetaMask transactions).
 
 ## Frontend Structure
 ```
@@ -52,7 +52,7 @@ frontend/
 │   │   ├── milestone/       # MilestoneTimeline
 │   │   ├── evidence/        # EvidencePanel
 │   │   └── wallet/         # WalletProvider, ConnectButton
-│   ├── hooks/              # useWallet
+│   ├── hooks/              # useWallet, useEscrows, useEscrowDetail, useDashboard
 │   ├── lib/                # provider.ts, contract.ts, api.ts, abi.json
 │   └── types/              # Escrow, Milestone, EscrowState, TransactionStatus, Dispute
 ```

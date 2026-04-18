@@ -5,93 +5,14 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout";
 import { Escrow, EscrowState, EscrowFilter } from "@/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-
-// Mock data — will be replaced with real on-chain data
-const mockEscrows: Escrow[] = [
-  {
-    id: "CS-992-PX",
-    client: "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21",
-    freelancer: "0x8626f214e5FaB0Fa2dE47a0e5f3C4c7d8a9b0c12",
-    state: EscrowState.Active,
-    currentMilestone: 3,
-    milestoneCount: 5,
-    totalAmount: "4.20",
-    arbitrator: "0x0000000000000000000000000000000000000000",
-    disputeTimeout: "0",
-  },
-  {
-    id: "CS-881-ZQ",
-    client: "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21",
-    freelancer: "0x9536f214e5FaB0Fa2dE47a0e5f3C4c7d8a9b0c34",
-    state: EscrowState.Completed,
-    currentMilestone: 4,
-    milestoneCount: 4,
-    totalAmount: "8.50",
-    arbitrator: "0x0000000000000000000000000000000000000000",
-    disputeTimeout: "0",
-  },
-  {
-    id: "CS-772-ML",
-    client: "0x123d35Cc6634C0532925a3b844Bc9e7595f8fC45",
-    freelancer: "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21",
-    state: EscrowState.Disputed,
-    currentMilestone: 2,
-    milestoneCount: 3,
-    totalAmount: "2.15",
-    arbitrator: "0xABC1234567890AbCdEf1234567890aBcDeF1234",
-    disputeTimeout: "1700000000",
-  },
-  {
-    id: "CS-643-AB",
-    client: "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21",
-    freelancer: "0xabcd6f214e5FaB0Fa2dE47a0e5f3C4c7d8a9b0c56",
-    state: EscrowState.Active,
-    currentMilestone: 1,
-    milestoneCount: 4,
-    totalAmount: "3.75",
-    arbitrator: "0x0000000000000000000000000000000000000000",
-    disputeTimeout: "0",
-  },
-  {
-    id: "CS-514-QR",
-    client: "0x9876e5FaB0Fa2dE47a0e5f3C4c7d8a9b0c67",
-    freelancer: "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21",
-    state: EscrowState.Active,
-    currentMilestone: 2,
-    milestoneCount: 6,
-    totalAmount: "6.00",
-    arbitrator: "0x0000000000000000000000000000000000000000",
-    disputeTimeout: "0",
-  },
-  {
-    id: "CS-445-TZ",
-    client: "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21",
-    freelancer: "0xdef16f214e5FaB0Fa2dE47a0e5f3C4c7d8a9b0c78",
-    state: EscrowState.Completed,
-    currentMilestone: 3,
-    milestoneCount: 3,
-    totalAmount: "2.50",
-    arbitrator: "0x0000000000000000000000000000000000000000",
-    disputeTimeout: "0",
-  },
-];
-
-const MOCK_ADDRESS = "0x742d35Cc6634C0532925a3b844Bc9e7595f8fC21";
+import { useEscrows } from "@/hooks";
+import { useWalletContext } from "@/components/wallet/WalletProvider";
 
 const filterOptions: { value: EscrowFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "client", label: "As Client" },
   { value: "freelancer", label: "As Freelancer" },
 ];
-
-const projectIcons: Record<string, string> = {
-  "CS-992-PX": "architecture",
-  "CS-881-ZQ": "smart_toy",
-  "CS-772-ML": "token",
-  "CS-643-AB": "code",
-  "CS-514-QR": "web",
-  "CS-445-TZ": "palette",
-};
 
 function getEscrowStatus(escrow: Escrow): "active" | "completed" | "pending" | "disputed" {
   switch (escrow.state) {
@@ -106,33 +27,25 @@ function getEscrowStatus(escrow: Escrow): "active" | "completed" | "pending" | "
 function getPhaseLabel(escrow: Escrow): string {
   if (escrow.state === EscrowState.Completed) return "Final Milestone";
   if (escrow.state === EscrowState.Disputed) return "Arbitration";
-  if (escrow.state === EscrowState.Created) return "Phase 1: Setup";
-  return `Phase ${escrow.currentMilestone}: Development`;
-}
-
-function getProjectName(id: string): string {
-  const names: Record<string, string> = {
-    "CS-992-PX": "Web3 DApp Redesign",
-    "CS-881-ZQ": "AI Agent Audit",
-    "CS-772-ML": "Liquidity Pool UI",
-    "CS-643-AB": "Smart Contract Audit",
-    "CS-514-QR": "DeFi Dashboard",
-    "CS-445-TZ": "NFT Marketplace",
-  };
-  return names[id] || `Escrow #${id}`;
+  if (escrow.state === EscrowState.Created) return "Awaiting Funding";
+  if (escrow.currentMilestone === 0) return "First Milestone";
+  return `Milestone ${escrow.currentMilestone}/${escrow.milestoneCount}`;
 }
 
 export default function ContractsPage() {
   const router = useRouter();
+  const { address, isConnected } = useWalletContext();
+  const { data: escrows, loading, error } = useEscrows(isConnected ? address : undefined);
   const [activeFilter, setActiveFilter] = useState<EscrowFilter>("all");
 
-  const filteredEscrows = mockEscrows.filter((escrow) => {
+  const filteredEscrows = escrows.filter((escrow) => {
     if (activeFilter === "all") return true;
+    if (!address) return false;
     if (activeFilter === "client") {
-      return escrow.client.toLowerCase() === MOCK_ADDRESS.toLowerCase();
+      return escrow.client.toLowerCase() === address.toLowerCase();
     }
     if (activeFilter === "freelancer") {
-      return escrow.freelancer.toLowerCase() === MOCK_ADDRESS.toLowerCase();
+      return escrow.freelancer.toLowerCase() === address.toLowerCase();
     }
     return true;
   });
@@ -178,178 +91,164 @@ export default function ContractsPage() {
         </div>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="glass-card p-6 rounded-2xl border border-white/5 shadow-xl">
-          <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest mb-1">
-            Total Locked Value
-          </p>
-          <p className="text-3xl font-bold text-white headline-font">{totalLocked} ETH</p>
-          <div className="mt-4 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary to-secondary w-3/4 shadow-[0_0_8px_rgba(76,215,246,0.5)]" />
-          </div>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <span className="material-symbols-outlined text-primary text-3xl animate-spin">
+            progress_activity
+          </span>
         </div>
-        <div className="glass-card p-6 rounded-2xl border border-white/5 shadow-xl">
-          <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest mb-1">
-            Active Contracts
-          </p>
-          <p className="text-3xl font-bold text-white headline-font">
-            {String(activeCount).padStart(2, "0")}
-          </p>
-          <div className="mt-4 flex items-center text-secondary text-xs font-bold">
-            <span className="material-symbols-outlined text-sm mr-1">trending_up</span>
-            +2 this month
-          </div>
+      ) : error ? (
+        <div className="glass-card p-8 text-center">
+          <span className="material-symbols-outlined text-error text-3xl mb-3 block">error</span>
+          <p className="text-sm text-error">{error}</p>
         </div>
-        <div className="glass-card p-6 rounded-2xl border border-white/5 shadow-xl">
-          <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest mb-1">
-            Success Rate
-          </p>
-          <p className="text-3xl font-bold text-white headline-font">{successRate}%</p>
-          <div className="mt-4 flex items-center text-primary text-xs font-bold">
-            <span className="material-symbols-outlined text-sm mr-1">verified</span>
-            High Trust Score
+      ) : (
+        <>
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="glass-card p-6 rounded-2xl border border-white/5 shadow-xl">
+              <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest mb-1">
+                Total Locked Value
+              </p>
+              <p className="text-3xl font-bold text-white headline-font">{totalLocked} ETH</p>
+              <div className="mt-4 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-primary to-secondary w-3/4 shadow-[0_0_8px_rgba(76,215,246,0.5)]" />
+              </div>
+            </div>
+            <div className="glass-card p-6 rounded-2xl border border-white/5 shadow-xl">
+              <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest mb-1">
+                Active Contracts
+              </p>
+              <p className="text-3xl font-bold text-white headline-font">
+                {String(activeCount).padStart(2, "0")}
+              </p>
+              <div className="mt-4 flex items-center text-secondary text-xs font-bold">
+                <span className="material-symbols-outlined text-sm mr-1">trending_up</span>
+                On-chain activity
+              </div>
+            </div>
+            <div className="glass-card p-6 rounded-2xl border border-white/5 shadow-xl">
+              <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest mb-1">
+                Success Rate
+              </p>
+              <p className="text-3xl font-bold text-white headline-font">{successRate}%</p>
+              <div className="mt-4 flex items-center text-primary text-xs font-bold">
+                <span className="material-symbols-outlined text-sm mr-1">verified</span>
+                Milestone completion
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Contract Table */}
-      <div className="bg-surface-container rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
-        {/* Table Header */}
-        <div className="bg-surface-container-high/50 px-4 sm:px-8 py-5 flex items-center justify-between gap-2">
-          <h3 className="font-bold headline-font text-lg text-white">Recent Contracts</h3>
-          <div className="flex items-center space-x-4">
-            <button className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
-              <span className="material-symbols-outlined">filter_list</span>
-            </button>
-            <button className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
-              <span className="material-symbols-outlined">search</span>
-            </button>
-          </div>
-        </div>
+          {/* Contract Table */}
+          <div className="bg-surface-container rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+            {/* Table Header */}
+            <div className="bg-surface-container-high/50 px-4 sm:px-8 py-5 flex items-center justify-between gap-2">
+              <h3 className="font-bold headline-font text-lg text-white">Recent Contracts</h3>
+            </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-surface-container-low/30 border-b border-white/5">
-                <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Project</th>
-                <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Role</th>
-                <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Total Value</th>
-                <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Current Phase</th>
-                <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Status</th>
-                <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {filteredEscrows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-8 py-12 text-center text-on-surface-variant">
-                    No contracts found
-                  </td>
-                </tr>
-              ) : (
-                filteredEscrows.map((escrow) => {
-                  const status = getEscrowStatus(escrow);
-                  const isClient = escrow.client.toLowerCase() === MOCK_ADDRESS.toLowerCase();
-                  const role = isClient ? "client" : "freelancer";
-                  const icon = projectIcons[escrow.id] || "description";
-                  const statusBorderColor =
-                    status === "active"
-                      ? "group-hover:border-primary/50"
-                      : status === "completed"
-                      ? "group-hover:border-secondary/50"
-                      : "group-hover:border-error/50";
-
-                  return (
-                    <tr
-                      key={escrow.id}
-                      className="hover:bg-white/5 transition-colors group"
-                    >
-                      <td className="px-8 py-6">
-                        <div className="flex items-center space-x-4">
-                          <div className={`w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center border border-white/10 ${statusBorderColor} transition-colors`}>
-                            <span className={`material-symbols-outlined ${
-                              status === "active" ? "text-primary" : status === "completed" ? "text-secondary" : "text-error"
-                            }`}>
-                              {icon}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-white headline-font">
-                              {getProjectName(escrow.id)}
-                            </p>
-                            <p className="text-[10px] text-on-surface-variant font-medium">
-                              ID: {escrow.id}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
-                          role === "freelancer"
-                            ? "bg-tertiary/10 text-tertiary"
-                            : "bg-primary/10 text-primary"
-                        }`}>
-                          {role === "freelancer" ? "Freelancer" : "Client"}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6">
-                        <p className="text-sm font-bold text-white headline-font">{escrow.totalAmount} ETH</p>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs font-medium text-on-surface">{getPhaseLabel(escrow)}</span>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            status === "active"
-                              ? "bg-primary shadow-[0_0_5px_#4cd7f6]"
-                              : status === "completed"
-                              ? "bg-secondary shadow-[0_0_5px_#4edea3]"
-                              : "bg-error shadow-[0_0_5px_#ffb4ab]"
-                          }`} />
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <StatusBadge status={status} />
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <button
-                          onClick={() => router.push(`/contracts/${escrow.id}`)}
-                          className="px-4 py-1.5 rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
-                        >
-                          Details
-                        </button>
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-surface-container-low/30 border-b border-white/5">
+                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Escrow</th>
+                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Role</th>
+                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Total Value</th>
+                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Current Phase</th>
+                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Status</th>
+                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {filteredEscrows.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-8 py-12 text-center text-on-surface-variant">
+                        No contracts found
                       </td>
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                  ) : (
+                    filteredEscrows.map((escrow) => {
+                      const status = getEscrowStatus(escrow);
+                      const isClient = address && escrow.client.toLowerCase() === address.toLowerCase();
+                      const role = isClient ? "client" : "freelancer";
 
-        {/* Pagination */}
-        <div className="px-4 sm:px-8 py-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 bg-surface-container-low/10">
-          <p className="text-[10px] text-on-surface-variant font-medium">
-            Showing <span className="text-white">{filteredEscrows.length}</span> of{" "}
-            <span className="text-white">{mockEscrows.length}</span> contracts
-          </p>
-          <div className="flex space-x-2">
-            <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-high text-on-surface-variant border border-white/5 hover:text-white transition-colors">
-              <span className="material-symbols-outlined text-sm">chevron_left</span>
-            </button>
-            <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary text-on-primary font-bold text-[10px]">
-              1
-            </button>
-            <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-high text-on-surface-variant border border-white/5 hover:text-white transition-colors text-[10px]">
-              2
-            </button>
-            <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-surface-container-high text-on-surface-variant border border-white/5 hover:text-white transition-colors">
-              <span className="material-symbols-outlined text-sm">chevron_right</span>
-            </button>
+                      return (
+                        <tr
+                          key={escrow.id}
+                          className="hover:bg-white/5 transition-colors group"
+                        >
+                          <td className="px-8 py-6">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center border border-white/10 transition-colors">
+                                <span className={`material-symbols-outlined ${
+                                  status === "active" ? "text-primary" : status === "completed" ? "text-secondary" : "text-error"
+                                }`}>
+                                  description
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-white headline-font">
+                                  Escrow #{escrow.id}
+                                </p>
+                                <p className="text-[10px] text-on-surface-variant font-medium">
+                                  {escrow.client.slice(0, 6)}...{escrow.client.slice(-4)} → {escrow.freelancer.slice(0, 6)}...{escrow.freelancer.slice(-4)}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
+                              role === "freelancer"
+                                ? "bg-tertiary/10 text-tertiary"
+                                : "bg-primary/10 text-primary"
+                            }`}>
+                              {role === "freelancer" ? "Freelancer" : "Client"}
+                            </span>
+                          </td>
+                          <td className="px-8 py-6">
+                            <p className="text-sm font-bold text-white headline-font">{escrow.totalAmount} ETH</p>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs font-medium text-on-surface">{getPhaseLabel(escrow)}</span>
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                status === "active"
+                                  ? "bg-primary shadow-[0_0_5px_#4cd7f6]"
+                                  : status === "completed"
+                                  ? "bg-secondary shadow-[0_0_5px_#4edea3]"
+                                  : "bg-error shadow-[0_0_5px_#ffb4ab]"
+                              }`} />
+                            </div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <StatusBadge status={status} />
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                            <button
+                              onClick={() => router.push(`/contracts/${escrow.id}`)}
+                              className="px-4 py-1.5 rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
+                            >
+                              Details
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="px-4 sm:px-8 py-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 bg-surface-container-low/10">
+              <p className="text-[10px] text-on-surface-variant font-medium">
+                Showing <span className="text-white">{filteredEscrows.length}</span> of{" "}
+                <span className="text-white">{escrows.length}</span> contracts
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Background Accents */}
       <div className="fixed -bottom-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none z-0" />

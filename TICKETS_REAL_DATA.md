@@ -49,28 +49,28 @@ Each phase = one commit checkpoint. Phases build sequentially.
 
 ---
 
-## Phase 3: Wire Read Pages — Replace Mock Data
+## Phase 3: Wire Read Pages — Replace Mock Data ✅ DONE
 
-### TICKET-RD-06: Wire dashboard page to real data
+### TICKET-RD-06: Wire dashboard page to real data ✅
 **File:** `frontend/src/app/dashboard/page.tsx`
 - Replace `mockStats` + `mockEscrows` with `useDashboard()` + `useEscrows()`
 - Show loading skeleton while fetching
 - Show empty state when no escrows
 - Filter escrows by connected wallet address
 
-### TICKET-RD-07: Wire contracts page to real data
+### TICKET-RD-07: Wire contracts page to real data ✅
 **File:** `frontend/src/app/contracts/page.tsx`
 - Replace `mockEscrows` with `useEscrows()` filtered by client/freelancer
 - Show loading state
 - Wire filter tabs (All / As Client / As Freelancer) to real data
 
-### TICKET-RD-08: Wire contract detail page to real data
+### TICKET-RD-08: Wire contract detail page to real data ✅
 **File:** `frontend/src/app/contracts/[id]/page.tsx`
 - Replace `getMockEscrow()` + `mockMilestones` with `useEscrowDetail(id)`
 - Show loading skeleton
 - Wire milestone actions (onFund, onCompleteMilestone, etc.) — stub handlers for now, Phase 4 implements them
 
-### TICKET-RD-09: Wire disputes page to real data
+### TICKET-RD-09: Wire disputes page to real data ✅
 **File:** `frontend/src/app/disputes/page.tsx`
 - Replace `mockDisputes` with filtering `useEscrows()` for disputed state
 - Build `Dispute` objects from on-chain escrow + milestone data
@@ -119,6 +119,6 @@ Each phase = one commit checkpoint. Phases build sequentially.
 |-------|---------|---------------------------|
 | 1 | RD-01, 02, 03 | Contract reads work from frontend, types aligned, API client ready | ✅ |
 | 2 | RD-04, 05 | Data hooks fetch real on-chain data, backend can list escrows | ✅ |
-| 3 | RD-06, 07, 08, 09 | All pages show real data (reads), no more mock data |
+| 3 | RD-06, 07, 08, 09 | All pages show real data (reads), no more mock data | ✅ |
 | 4 | RD-10, 11, 12 | Full write flow — create escrows, fund, approve, dispute, claim, cancel |
 | 5 | RD-13 | Polished tx feedback with toasts and Etherscan links |
