@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { resetProvider } from "@/lib/provider";
 
 declare global {
   interface Window {
@@ -69,6 +70,7 @@ export function useWallet() {
       };
 
       const handleChainChanged = (chainIdHex: unknown) => {
+        resetProvider();
         setState((prev) => ({ ...prev, chainId: parseInt(chainIdHex as string, 16) }));
       };
 
@@ -151,6 +153,7 @@ export function useWallet() {
 
   const disconnect = () => {
     localStorage.setItem("chainsteps_disconnected", "true");
+    resetProvider();
     setState({
       address: null,
       chainId: null,

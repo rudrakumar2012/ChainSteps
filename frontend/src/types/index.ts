@@ -43,6 +43,9 @@ export interface DashboardStats {
   totalLocked: string;
   activeContracts: number;
   pendingMilestones: number;
+  totalEscrows: number;
+  completedEscrows: number;
+  milestoneCompletionRate: string;
 }
 
 export interface CreateEscrowFormData {

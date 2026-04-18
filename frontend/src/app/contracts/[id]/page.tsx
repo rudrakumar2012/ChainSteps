@@ -14,6 +14,7 @@ import {
   completeMilestoneTx,
   approveMilestoneTx,
   raiseDisputeTx,
+  resolveDisputeTx,
   claimMilestoneTx,
   cancelEscrowTx,
   TxHandle,
@@ -39,6 +40,9 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   const { address } = useWalletContext();
   const { trackTx } = useTransactionContext();
   const { escrow, milestones, loading, error, refetch } = useEscrowDetail(id);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   if (loading) {
     return (
@@ -68,9 +72,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   );
   const isClient = address?.toLowerCase() === escrow.client.toLowerCase();
   const isFreelancer = address?.toLowerCase() === escrow.freelancer.toLowerCase();
-  const [pendingAction, setPendingAction] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-
+  const isArbitrator = escrow.arbitrator && escrow.arbitrator !== ethers.ZeroAddress && address?.toLowerCase() === escrow.arbitrator.toLowerCase();
   const escrowIdNum = Number(escrow.id);
 
   const handleAction = async (label: string, fn: () => Promise<TxHandle>) => {
@@ -262,7 +264,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                           </button>
                         </div>
                       )}
-                      {isActive && isFreelancer && !milestones[index].isCompleted && (
+                      {isFunded && isFreelancer && !milestones[index].isCompleted && (
                         <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
                           <button
                             onClick={() => handleAction("Complete", () => completeMilestoneTx(escrowIdNum))}
@@ -314,13 +316,32 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
           {/* Cancel Escrow (Created state, client only) */}
           {escrow.state === EscrowState.Created && isClient && (
             <div className="p-4">
-              <button
-                onClick={() => handleAction("Cancel", () => cancelEscrowTx(escrowIdNum))}
-                disabled={!!pendingAction}
-                className="text-on-surface-variant hover:text-error text-xs font-bold transition-colors disabled:opacity-50"
-              >
-                Cancel Escrow
-              </button>
+              {!confirmCancel ? (
+                <button
+                  onClick={() => setConfirmCancel(true)}
+                  disabled={!!pendingAction}
+                  className="text-on-surface-variant hover:text-error text-xs font-bold transition-colors disabled:opacity-50"
+                >
+                  Cancel Escrow
+                </button>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <p className="text-xs text-error font-bold">Return all locked funds?</p>
+                  <button
+                    onClick={() => { setConfirmCancel(false); handleAction("Cancel", () => cancelEscrowTx(escrowIdNum)); }}
+                    disabled={!!pendingAction}
+                    className="text-xs font-bold text-error bg-error/10 px-3 py-1 rounded hover:bg-error/20 transition-colors disabled:opacity-50"
+                  >
+                    Confirm Cancel
+                  </button>
+                  <button
+                    onClick={() => setConfirmCancel(false)}
+                    className="text-xs font-bold text-on-surface-variant hover:text-white transition-colors"
+                  >
+                    Keep
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -348,6 +369,11 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                 </button>
               </div>
             </div>
+          )}
+
+          {/* Resolve Dispute (arbitrator only) */}
+          {escrow.state === EscrowState.Disputed && isArbitrator && (
+            <DisputeResolver escrowIdNum={escrowIdNum} pendingAction={pendingAction} onAction={handleAction} />
           )}
 
           {/* Action Error */}
@@ -441,5 +467,45 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function DisputeResolver({ escrowIdNum, pendingAction, onAction }: { escrowIdNum: number; pendingAction: string | null; onAction: (label: string, fn: () => Promise<TxHandle>) => Promise<void> }) {
+  const [clientPercent, setClientPercent] = useState(50);
+
+  return (
+    <div className="bg-surface-container rounded-xl p-6 border border-secondary/20">
+      <h3 className="text-sm font-bold text-white headline-font mb-1 flex items-center gap-2">
+        <span className="material-symbols-outlined text-secondary text-[16px]">gavel</span>
+        Resolve Dispute
+      </h3>
+      <p className="text-xs text-on-surface-variant mb-3">
+        Set the client&apos;s share. The freelancer receives the remainder.
+      </p>
+      <div className="flex items-center gap-4 mb-3">
+        <label className="text-xs text-on-surface-variant">Client share:</label>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={clientPercent}
+          onChange={(e) => setClientPercent(Number(e.target.value))}
+          className="flex-1 accent-primary"
+        />
+        <span className="text-sm font-bold text-white headline-font w-12 text-right">{clientPercent}%</span>
+      </div>
+      <button
+        onClick={() => onAction("Resolve", () => resolveDisputeTx(escrowIdNum, clientPercent))}
+        disabled={!!pendingAction}
+        className="bg-secondary text-on-secondary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+      >
+        {pendingAction === "Resolve" ? (
+          <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+        ) : (
+          <span className="material-symbols-outlined text-[16px]">gavel</span>
+        )}
+        {pendingAction === "Resolve" ? "Confirming..." : "Resolve"}
+      </button>
+    </div>
   );
 }

@@ -8,37 +8,37 @@ const features = [
     icon: "lock",
     title: "Non-Custodial Escrow",
     description:
-      "Funds are locked in smart contracts, not held by intermediaries. You maintain control throughout the entire milestone process.",
+      "Funds are locked in the smart contract at 0x7b2D...9021, not held by any intermediary. The contract enforces release rules \u2014 no one can freeze or redirect your escrow.",
   },
   {
     icon: "timeline",
-    title: "Milestone-Based Releases",
+    title: "Milestone-Based Payments",
     description:
-      "Release funds incrementally as work is completed and verified. Each milestone requires explicit approval from both parties.",
+      "Break work into sequential milestones. Each requires explicit approval via approveMilestone(). If the client goes silent, claimMilestone() auto-releases funds after 7 days.",
   },
   {
     icon: "balance",
-    title: "Built-In Dispute Resolution",
+    title: "Arbitrated Dispute Resolution",
     description:
-      "Neutral arbitration for contested milestones with timeout-based automatic release to prevent funds being locked indefinitely.",
+      "When milestones are contested, a designated arbitrator resolves disputes with an on-chain percentage split via resolveDispute(). Both parties receive their share transparently.",
   },
   {
     icon: "cloud_upload",
     title: "IPFS Evidence Storage",
     description:
-      "Store work proofs, deliverables, and communication on decentralized storage linked to each milestone for transparent verification.",
+      "Submit work proofs and deliverables to IPFS for tamper-resistant, decentralized storage linked to each milestone. Evidence persists independent of any single server.",
   },
   {
-    icon: "bolt",
-    title: "Low-Cost Execution",
+    icon: "security",
+    title: "Reentrancy-Protected",
     description:
-      "Designed for minimal gas consumption. Each milestone operation costs less than $0.10 on Ethereum Sepolia testnet.",
+      "All value-transfer functions use OpenZeppelin's ReentrancyGuard. Built on Solidity 0.8.28 with native overflow protection. No unaudited external dependencies.",
   },
   {
     icon: "group",
-    title: "Role-Based Permissions",
+    title: "Role-Based Access Control",
     description:
-      "Clear client/freelancer roles with distinct permissions. Clients fund milestones, freelancers submit deliverables for approval.",
+      "Contract-enforced roles: only the client can fund and approve, only the freelancer can submit and claim. State transitions are guarded by inState modifiers.",
   },
 ];
 

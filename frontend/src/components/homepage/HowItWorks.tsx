@@ -5,33 +5,33 @@ import { motion } from "framer-motion";
 const steps = [
   {
     number: "01",
-    title: "Create Escrow",
+    title: "Create & Define",
     description:
-      "Define project scope, milestones, and funding amounts. Both parties agree to terms before deployment.",
+      "Client calls createEscrow() with the freelancer's address and an arbitrator, then adds milestones via addMilestone() with descriptions and ETH amounts.",
     icon: "add_circle",
     color: "primary",
   },
   {
     number: "02",
-    title: "Fund Milestones",
+    title: "Fund & Activate",
     description:
-      "Client locks ETH into the smart contract for each milestone. Funds are secured until release conditions are met.",
+      "Client sends ETH to fundEscrow(). The contract verifies the total matches all milestone amounts, then activates the escrow. Funds are locked until milestone rules are met.",
     icon: "account_balance",
     color: "secondary",
   },
   {
     number: "03",
-    title: "Work & Submit",
+    title: "Submit Work",
     description:
-      "Freelancer completes work, submits deliverables with IPFS evidence, and requests milestone approval.",
+      "Freelancer completes deliverables and calls completeMilestone(). A 7-day approval countdown starts. Evidence can be uploaded to IPFS for verification.",
     icon: "work",
     color: "tertiary",
   },
   {
     number: "04",
-    title: "Verify & Release",
+    title: "Approve & Release",
     description:
-      "Client reviews deliverables, approves release, and funds are transferred. Disputes go to arbitration.",
+      "Client reviews and calls approveMilestone() to release ETH to the freelancer. If the client is unresponsive, the freelancer claims via claimMilestone() after timeout.",
     icon: "verified",
     color: "primary",
   },

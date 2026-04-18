@@ -127,7 +127,7 @@ export default function CreateEscrowPage() {
 
       // Step 3: Fund escrow
       setSubmitStep("Funding escrow...");
-      const fundHandle = await trackTx("Fund Escrow", () => fundEscrowTx(escrowId!, totalAmount.toFixed(4)));
+      const fundHandle = await trackTx("Fund Escrow", () => fundEscrowTx(escrowId!, totalAmount));
       await fundHandle.wait();
 
       router.push(`/contracts/${escrowId}`);
@@ -140,9 +140,11 @@ export default function CreateEscrowPage() {
     }
   };
 
-  const totalAmount = formData.milestones.reduce(
-    (sum, m) => sum + parseFloat(m.amount || "0"),
-    0
+  const totalAmount = ethers.formatEther(
+    formData.milestones.reduce(
+      (sum, m) => sum + (m.amount ? ethers.parseEther(m.amount) : BigInt(0)),
+      BigInt(0)
+    )
   );
 
   const clientAddress = address || "0x0000000000000000000000000000000000000000";
@@ -340,7 +342,7 @@ export default function CreateEscrowPage() {
                   </p>
                   <div className="flex items-baseline space-x-2">
                     <span className="headline-font text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                      {totalAmount.toFixed(2)}
+                      {parseFloat(totalAmount).toFixed(2)}
                     </span>
                     <span className="headline-font text-xl text-primary font-medium">ETH</span>
                   </div>

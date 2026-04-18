@@ -1,28 +1,37 @@
 "use client";
 
-import { useMemo } from "react";
-import { useEscrows } from "./useEscrows";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { fetchAllEscrowsPublic } from "@/lib/contract";
 import type { DashboardStats, Escrow } from "@/types";
 
-interface UseDashboardResult {
-  stats: DashboardStats;
-  escrows: Escrow[];
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
-}
+export function useHomepageStats() {
+  const [escrows, setEscrows] = useState<Escrow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export function useDashboard(address?: string | null): UseDashboardResult {
-  const { data: escrows, loading, error, refetch } = useEscrows(address);
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchAllEscrowsPublic();
+      setEscrows(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch protocol data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   const stats = useMemo<DashboardStats>(() => {
     const active = escrows.filter((e) => e.state === 1);
     const completed = escrows.filter((e) => e.state === 3);
     const totalLocked = active.reduce((sum, e) => sum + parseFloat(e.totalAmount), 0);
     const pendingMilestones = escrows.reduce((sum, e) => {
-      if (e.state === 1) {
-        return sum + (e.milestoneCount - e.currentMilestone);
-      }
+      if (e.state === 1) return sum + (e.milestoneCount - e.currentMilestone);
       return sum;
     }, 0);
     const totalMilestones = escrows.reduce((sum, e) => sum + e.milestoneCount, 0);
@@ -41,5 +50,5 @@ export function useDashboard(address?: string | null): UseDashboardResult {
     };
   }, [escrows]);
 
-  return { stats, escrows, loading, error, refetch };
+  return { stats, loading, error, refetch: fetch };
 }

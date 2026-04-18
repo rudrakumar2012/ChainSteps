@@ -15,3 +15,14 @@ export function getProvider(): ethers.BrowserProvider {
 export function resetProvider(): void {
   provider = null;
 }
+
+const SEPOLIA_RPC_URL = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
+
+let readOnlyProvider: ethers.JsonRpcProvider | null = null;
+
+export function getReadOnlyProvider(): ethers.JsonRpcProvider {
+  if (!readOnlyProvider) {
+    readOnlyProvider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+  }
+  return readOnlyProvider;
+}

@@ -62,8 +62,11 @@ export default function DisputesPage() {
   const router = useRouter();
   const { address, isConnected } = useWalletContext();
   const { trackTx } = useTransactionContext();
-  const { data: escrows, loading, error } = useEscrows(isConnected ? address : undefined);
+  const { data: escrows, loading, error, refetch } = useEscrows(isConnected ? address : undefined);
   const [activeFilter, setActiveFilter] = useState<"all" | DisputeStatus>("all");
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  const [resolveErrors, setResolveErrors] = useState<Record<string, string | null>>({});
+  const [clientPercents, setClientPercents] = useState<Record<string, number>>({});
 
   const disputes = buildDisputess(escrows);
   const filtered = disputes.filter((d) => {
@@ -71,18 +74,17 @@ export default function DisputesPage() {
     return getDisputeStatus(d) === activeFilter;
   });
 
-  const [resolvingId, setResolvingId] = useState<string | null>(null);
-  const [resolveError, setResolveError] = useState<string | null>(null);
-  const [clientPercent, setClientPercent] = useState(50);
+  const getClientPercent = (escrowId: string) => clientPercents[escrowId] ?? 50;
 
   const handleResolve = async (escrowId: string) => {
     setResolvingId(escrowId);
-    setResolveError(null);
+    setResolveErrors((prev) => ({ ...prev, [escrowId]: null }));
     try {
-      await trackTx("Resolve Dispute", () => resolveDisputeTx(Number(escrowId), clientPercent));
-      setTimeout(() => window.location.reload(), 1500);
+      const pct = getClientPercent(escrowId);
+      await trackTx("Resolve Dispute", () => resolveDisputeTx(Number(escrowId), pct));
+      refetch();
     } catch (err: any) {
-      setResolveError(err?.reason || err?.message || "Failed to resolve dispute");
+      setResolveErrors((prev) => ({ ...prev, [escrowId]: err?.reason || err?.message || "Failed to resolve dispute" }));
     } finally {
       setResolvingId(null);
     }
@@ -244,11 +246,11 @@ export default function DisputesPage() {
                               type="range"
                               min={0}
                               max={100}
-                              value={clientPercent}
-                              onChange={(e) => setClientPercent(Number(e.target.value))}
+                              value={getClientPercent(dispute.escrowId)}
+                              onChange={(e) => setClientPercents((prev) => ({ ...prev, [dispute.escrowId]: Number(e.target.value) }))}
                               className="flex-1 accent-primary"
                             />
-                            <span className="text-sm font-bold text-white headline-font w-12 text-right">{clientPercent}%</span>
+                            <span className="text-sm font-bold text-white headline-font w-12 text-right">{getClientPercent(dispute.escrowId)}%</span>
                           </div>
                           <button
                             onClick={() => handleResolve(dispute.escrowId)}
@@ -262,8 +264,8 @@ export default function DisputesPage() {
                             )}
                             {resolvingId === dispute.escrowId ? "Confirming..." : "Resolve"}
                           </button>
-                          {resolveError && resolvingId === null && (
-                            <p className="text-xs text-error mt-2">{resolveError}</p>
+                          {resolveErrors[dispute.escrowId] && resolvingId === null && (
+                            <p className="text-xs text-error mt-2">{resolveErrors[dispute.escrowId]}</p>
                           )}
                         </div>
                       )}

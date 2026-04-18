@@ -3,15 +3,23 @@
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useWalletContext } from "../wallet/WalletProvider";
+import { useHomepageStats } from "@/hooks/useHomepageStats";
+import { BlockchainCube } from "./BlockchainCube";
+
+function StatValue({ value, suffix, loading, error }: { value: string; suffix?: string; loading: boolean; error: string | null }) {
+  if (loading) return <span className="inline-block w-16 h-8 bg-surface-container-high rounded animate-pulse" />;
+  if (error) return <span>--</span>;
+  return <>{value}{suffix}</>;
+}
 
 export function Hero() {
   const [gradientIndex, setGradientIndex] = useState(0);
   const { isConnected, connect } = useWalletContext();
   const router = useRouter();
   const [wantsToLaunch, setWantsToLaunch] = useState(false);
+  const { stats, loading, error } = useHomepageStats();
 
   useEffect(() => {
     if (isConnected && wantsToLaunch) {
@@ -41,128 +49,96 @@ export function Hero() {
     return () => clearInterval(interval);
   }, [gradients.length]);
 
+  const statItems = [
+    { value: stats.totalLocked, suffix: " ETH", label: "Value Locked" },
+    { value: String(stats.totalEscrows), suffix: "", label: "Total Escrows" },
+    { value: stats.milestoneCompletionRate, suffix: "%", label: "Milestone Rate" },
+    { value: String(stats.completedEscrows), suffix: "", label: "Completed" },
+  ];
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-surface">
-      {/* Floating Orbs Background */}
-      <div className="absolute inset-0">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary/10 blur-3xl"
-          animate={{
-            x: [0, 20, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/10 blur-3xl"
-          animate={{
-            x: [0, -30, 0],
-            y: [0, 20, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        />
-        <motion.div
-          className="absolute top-3/4 left-3/4 w-48 h-48 rounded-full bg-tertiary/10 blur-3xl"
-          animate={{
-            x: [0, 15, 0],
-            y: [0, 15, 0],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2,
-          }}
-        />
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-surface">
+      {/* Subtle background glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/5 blur-[100px]" />
       </div>
 
-      {/* Hero Content */}
+      {/* Hero Content — 2-col on desktop, stacked on mobile */}
       <div className="container mx-auto px-6 py-12 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Animated Gradient Text */}
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left: 3D Animation */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="relative h-[300px] sm:h-[360px] lg:h-[420px] order-1 lg:order-1"
           >
-            <h1 className="headline-font text-5xl md:text-7xl font-bold tracking-tighter mb-6">
-              <span
-                className="bg-clip-text text-transparent bg-gradient-to-br from-primary to-secondary animate-gradient"
-                style={{
-                  backgroundImage: gradients[gradientIndex],
-                  transition: "background-image 1s ease",
-                }}
-              >
-                Trustless Escrow
-              </span>
-              <br />
-              <span className="text-white">for Web3</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-on-surface-variant max-w-2xl mx-auto mb-10">
-              Secure milestone-based contracts with decentralized verification,
-              transparent funding, and built-in dispute resolution.
-            </p>
+            <BlockchainCube />
           </motion.div>
 
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
-          >
-            <Button variant="primary" size="lg" onClick={handleLaunch}>
-              <span className="material-symbols-outlined">rocket_launch</span>
-              Launch App
-            </Button>
-            <Button variant="ghost" size="lg">
-              <span className="material-symbols-outlined">play_circle</span>
-              View Demo
-            </Button>
-          </motion.div>
+          {/* Right: Text + CTAs + Stats */}
+          <div className="text-center lg:text-left order-2 lg:order-2">
+            {/* Animated Gradient Text */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8"
+            >
+              <h1 className="headline-font text-5xl md:text-7xl font-bold tracking-tighter mb-6">
+                <span
+                  className="bg-clip-text text-transparent animate-gradient"
+                  style={{
+                    backgroundImage: gradients[gradientIndex],
+                    transition: "background-image 1s ease",
+                  }}
+                >
+                  Trustless Escrow
+                </span>
+                <br />
+                <span className="text-white">for Web3</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-on-surface-variant max-w-2xl mx-auto lg:mx-0 mb-10">
+                Secure milestone-based contracts with decentralized verification,
+                transparent funding, and built-in dispute resolution.
+              </p>
+            </motion.div>
 
-          {/* Trust Indicators */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4"
-          >
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                42.5K
-              </div>
-              <div className="text-sm text-on-surface-variant">ETH Locked</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                1,200+
-              </div>
-              <div className="text-sm text-on-surface-variant">Active Contracts</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                98.2%
-              </div>
-              <div className="text-sm text-on-surface-variant">Success Rate</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                $0.10
-              </div>
-              <div className="text-sm text-on-surface-variant">Per Milestone</div>
-            </div>
-          </motion.div>
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12"
+            >
+              <Button variant="primary" size="lg" onClick={handleLaunch}>
+                <span className="material-symbols-outlined">rocket_launch</span>
+                Launch App
+              </Button>
+              <Button variant="ghost" size="lg" onClick={() => router.push("/contracts")}>
+                <span className="material-symbols-outlined">visibility</span>
+                View Contracts
+              </Button>
+            </motion.div>
+
+            {/* Real Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            >
+              {statItems.map((stat) => (
+                <div key={stat.label} className="text-center lg:text-left">
+                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+                    <StatValue value={stat.value} suffix={stat.suffix} loading={loading} error={error} />
+                  </div>
+                  <div className="text-xs text-on-surface-variant uppercase tracking-wider">{stat.label}</div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </div>
 

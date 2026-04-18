@@ -2,43 +2,13 @@
 
 import { motion } from "framer-motion";
 import { GlassCard } from "../ui/GlassCard";
-
-const indicators = [
-  {
-    title: "Total Value Locked",
-    value: "42.50 ETH",
-    description: "Secured across all active escrows",
-    icon: "lock",
-    color: "primary",
-  },
-  {
-    title: "Active Contracts",
-    value: "1,200+",
-    description: "Ongoing milestone‑based agreements",
-    icon: "description",
-    color: "secondary",
-  },
-  {
-    title: "Success Rate",
-    value: "98.2%",
-    description: "Of milestones completed without dispute",
-    icon: "verified",
-    color: "tertiary",
-  },
-  {
-    title: "Avg. Cost",
-    value: "$0.10",
-    description: "Per milestone operation on Sepolia",
-    icon: "savings",
-    color: "primary",
-  },
-];
+import { useHomepageStats } from "@/hooks/useHomepageStats";
 
 const badges = [
-  { label: "Non‑Custodial", icon: "shield" },
-  { label: "Fully Audited", icon: "security" },
+  { label: "Non-Custodial", icon: "shield" },
+  { label: "Reentrancy Guard", icon: "security" },
   { label: "Open Source", icon: "code" },
-  { label: "Decentralized", icon: "language" },
+  { label: "On-Chain Verification", icon: "language" },
 ];
 
 const containerVariants = {
@@ -62,7 +32,44 @@ const shadowClasses: Record<string, string> = {
   tertiary: "shadow-tertiary/20",
 };
 
+function StatSkeleton() {
+  return <span className="inline-block w-20 h-6 bg-surface-container-high rounded animate-pulse" />;
+}
+
 export function TrustIndicators() {
+  const { stats, loading, error } = useHomepageStats();
+
+  const indicators = [
+    {
+      title: "Total Value Locked",
+      value: loading ? null : error ? "--" : `${stats.totalLocked} ETH`,
+      description: "Secured across all active escrows on Sepolia",
+      icon: "lock",
+      color: "primary",
+    },
+    {
+      title: "Total Escrows",
+      value: loading ? null : error ? "--" : String(stats.totalEscrows),
+      description: "Escrow contracts deployed since inception",
+      icon: "description",
+      color: "secondary",
+    },
+    {
+      title: "Milestone Completion",
+      value: loading ? null : error ? "--" : `${stats.milestoneCompletionRate}%`,
+      description: "Of milestones completed and approved on-chain",
+      icon: "verified",
+      color: "tertiary",
+    },
+    {
+      title: "Completed Escrows",
+      value: loading ? null : error ? "--" : String(stats.completedEscrows),
+      description: "Fully settled with all milestones released",
+      icon: "handshake",
+      color: "primary",
+    },
+  ];
+
   return (
     <section className="py-20 bg-surface-container-low">
       <div className="container mx-auto px-6">
@@ -76,7 +83,7 @@ export function TrustIndicators() {
             Trust & Transparency
           </h2>
           <p className="text-on-surface-variant text-lg max-w-2xl mx-auto">
-            Built on Ethereum with verifiable security and real‑time metrics.
+            Real metrics from the ChainSteps protocol on Ethereum Sepolia.
           </p>
         </motion.div>
 
@@ -109,7 +116,7 @@ export function TrustIndicators() {
                   </div>
                   <div>
                     <div className="headline-font text-2xl font-bold text-white mb-1">
-                      {indicator.value}
+                      {indicator.value === null ? <StatSkeleton /> : indicator.value}
                     </div>
                     <h3 className="font-bold text-white mb-1">
                       {indicator.title}
@@ -133,7 +140,7 @@ export function TrustIndicators() {
           className="max-w-3xl mx-auto"
         >
           <h3 className="headline-font text-2xl font-bold text-white text-center mb-8">
-            Security & Compliance
+            Security & Integrity
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {badges.map((badge, index) => (

@@ -170,7 +170,8 @@ export default function ContractsPage() {
                     filteredEscrows.map((escrow) => {
                       const status = getEscrowStatus(escrow);
                       const isClient = address && escrow.client.toLowerCase() === address.toLowerCase();
-                      const role = isClient ? "client" : "freelancer";
+                      const isArbitrator = escrow.arbitrator && escrow.arbitrator !== "0x0000000000000000000000000000000000000000" && address && escrow.arbitrator.toLowerCase() === address.toLowerCase();
+                      const role = isClient ? "client" : isArbitrator ? "arbitrator" : "freelancer";
 
                       return (
                         <tr
