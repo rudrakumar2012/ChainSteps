@@ -97,3 +97,61 @@ export async function fetchEscrowsByAddress(address: string): Promise<Escrow[]> 
     (e) => e.client.toLowerCase() === lower || e.freelancer.toLowerCase() === lower
   );
 }
+
+// Write operations — each sends a transaction via MetaMask
+
+export async function createEscrowTx(freelancer: string, arbitrator: string): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const tx = await contract.createEscrow(freelancer, arbitrator);
+  return tx.wait();
+}
+
+export async function addMilestoneTx(escrowId: number, description: string, amount: string): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const value = ethers.parseEther(amount);
+  const tx = await contract.addMilestone(escrowId, description, value);
+  return tx.wait();
+}
+
+export async function fundEscrowTx(escrowId: number, amount: string): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const value = ethers.parseEther(amount);
+  const tx = await contract.fundEscrow(escrowId, { value });
+  return tx.wait();
+}
+
+export async function completeMilestoneTx(escrowId: number): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const tx = await contract.completeMilestone(escrowId);
+  return tx.wait();
+}
+
+export async function approveMilestoneTx(escrowId: number): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const tx = await contract.approveMilestone(escrowId);
+  return tx.wait();
+}
+
+export async function raiseDisputeTx(escrowId: number): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const tx = await contract.raiseDispute(escrowId);
+  return tx.wait();
+}
+
+export async function resolveDisputeTx(escrowId: number, clientPercent: number): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const tx = await contract.resolveDispute(escrowId, clientPercent);
+  return tx.wait();
+}
+
+export async function claimMilestoneTx(escrowId: number): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const tx = await contract.claimMilestone(escrowId);
+  return tx.wait();
+}
+
+export async function cancelEscrowTx(escrowId: number): Promise<ethers.TransactionReceipt | null> {
+  const contract = await getWriteContract();
+  const tx = await contract.cancelEscrow(escrowId);
+  return tx.wait();
+}

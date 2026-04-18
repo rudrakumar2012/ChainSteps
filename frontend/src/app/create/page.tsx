@@ -8,6 +8,8 @@ import { MilestonesStep } from "@/components/create/MilestonesStep";
 import { ReviewStep } from "@/components/create/ReviewStep";
 import { CreateEscrowFormData } from "@/types";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
+import { createEscrowTx, addMilestoneTx, fundEscrowTx } from "@/lib/contract";
+import { ethers } from "ethers";
 
 type Step = "parties" | "milestones" | "review";
 
@@ -82,19 +84,53 @@ export default function CreateEscrowPage() {
     else if (currentStep === "review") setCurrentStep("milestones");
   };
 
+  const [submitStep, setSubmitStep] = useState<string>("");
+
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
     setIsSubmitting(true);
     try {
-      // TODO: Wire to real contract deployment
-      console.log("Deploying escrow:", formData);
-      await new Promise((r) => setTimeout(r, 2000));
-      router.push("/contracts");
-    } catch (err) {
+      const arbitrator = formData.arbitrator || ethers.ZeroAddress;
+
+      // Step 1: Create escrow
+      setSubmitStep("Creating escrow...");
+      const receipt = await createEscrowTx(formData.freelancer, arbitrator);
+      if (!receipt) throw new Error("Transaction failed");
+
+      // Extract escrowId from EscrowCreated event
+      const iface = new ethers.Interface([
+        "event EscrowCreated(uint256 indexed escrowId, address client, address freelancer)",
+      ]);
+      let escrowId: number | null = null;
+      for (const log of receipt.logs) {
+        try {
+          const parsed = iface.parseLog({ topics: log.topics as string[], data: log.data });
+          if (parsed) {
+            escrowId = Number(parsed.args[0]);
+            break;
+          }
+        } catch {}
+      }
+      if (escrowId === null) throw new Error("Could not determine escrow ID from transaction");
+
+      // Step 2: Add milestones
+      for (let i = 0; i < formData.milestones.length; i++) {
+        const m = formData.milestones[i];
+        setSubmitStep(`Adding milestone ${i + 1}/${formData.milestones.length}...`);
+        await addMilestoneTx(escrowId!, m.description, m.amount);
+      }
+
+      // Step 3: Fund escrow
+      setSubmitStep("Funding escrow...");
+      await fundEscrowTx(escrowId!, totalAmount.toFixed(4));
+
+      router.push(`/contracts/${escrowId}`);
+    } catch (err: any) {
       console.error("Escrow creation failed:", err);
-      setErrors({ submit: "Failed to create escrow. Please try again." });
+      setErrors({ submit: err?.reason || err?.message || "Failed to create escrow. Please try again." });
     } finally {
       setIsSubmitting(false);
+      setSubmitStep("");
     }
   };
 
@@ -272,7 +308,7 @@ export default function CreateEscrowPage() {
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                      Deploying...
+                      {submitStep || "Deploying..."}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
@@ -326,10 +362,10 @@ export default function CreateEscrowPage() {
             >
               <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               <span className="headline-font text-lg font-bold tracking-tight">
-                {isSubmitting ? "Deploying..." : "Deploy to Sepolia"}
+                {isSubmitting ? (submitStep || "Deploying...") : "Deploy to Sepolia"}
               </span>
               <span className="text-[10px] uppercase font-bold tracking-widest opacity-70">
-                Initialize Contract
+                {isSubmitting ? "Confirm in MetaMask" : "Initialize Contract"}
               </span>
             </button>
           </div>

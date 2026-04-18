@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/layout";
@@ -8,6 +8,15 @@ import { EscrowState, Milestone } from "@/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrowDetail } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
+import {
+  fundEscrowTx,
+  completeMilestoneTx,
+  approveMilestoneTx,
+  raiseDisputeTx,
+  claimMilestoneTx,
+  cancelEscrowTx,
+} from "@/lib/contract";
+import { ethers } from "ethers";
 
 type MilestoneState = "released" | "in_review" | "funded" | "unfunded";
 
@@ -26,7 +35,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params);
   const router = useRouter();
   const { address } = useWalletContext();
-  const { escrow, milestones, loading, error } = useEscrowDetail(id);
+  const { escrow, milestones, loading, error, refetch } = useEscrowDetail(id);
 
   if (loading) {
     return (
@@ -56,6 +65,23 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   );
   const isClient = address?.toLowerCase() === escrow.client.toLowerCase();
   const isFreelancer = address?.toLowerCase() === escrow.freelancer.toLowerCase();
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const escrowIdNum = Number(escrow.id);
+
+  const handleAction = async (label: string, fn: () => Promise<ethers.TransactionReceipt | null>) => {
+    setPendingAction(label);
+    setActionError(null);
+    try {
+      await fn();
+      refetch();
+    } catch (err: any) {
+      setActionError(err?.reason || err?.message || `${label} failed`);
+    } finally {
+      setPendingAction(null);
+    }
+  };
 
   return (
     <AppShell>
@@ -208,29 +234,45 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                         </span>
                       </div>
 
-                      {/* Action Buttons for Active Milestone — stubs for Phase 4 */}
-                      {isActive && (
+                      {/* Action Buttons */}
+                      {isActive && isClient && (
                         <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
-                          {isClient && (
-                            <>
-                              <button
-                                onClick={() => console.log("Approve milestone", index)}
-                                className="flex-1 bg-secondary text-on-secondary font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all"
-                              >
-                                <span className="material-symbols-outlined text-[20px]">
-                                  verified_user
-                                </span>
-                                Approve &amp; Pay
-                              </button>
-                              <button
-                                onClick={() => console.log("Dispute milestone", index)}
-                                className="flex-1 border border-error/50 text-error font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:bg-error/10 active:scale-[0.98] transition-all"
-                              >
-                                <span className="material-symbols-outlined text-[20px]">warning</span>
-                                Initiate Dispute
-                              </button>
-                            </>
-                          )}
+                          <button
+                            onClick={() => handleAction("Approve", () => approveMilestoneTx(escrowIdNum))}
+                            disabled={!!pendingAction}
+                            className="flex-1 bg-secondary text-on-secondary font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                          >
+                            {pendingAction === "Approve" ? (
+                              <span className="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>
+                            ) : (
+                              <span className="material-symbols-outlined text-[20px]">verified_user</span>
+                            )}
+                            {pendingAction === "Approve" ? "Confirming..." : "Approve & Pay"}
+                          </button>
+                          <button
+                            onClick={() => handleAction("Dispute", () => raiseDisputeTx(escrowIdNum))}
+                            disabled={!!pendingAction}
+                            className="flex-1 border border-error/50 text-error font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:bg-error/10 active:scale-[0.98] transition-all disabled:opacity-50"
+                          >
+                            <span className="material-symbols-outlined text-[20px]">warning</span>
+                            Initiate Dispute
+                          </button>
+                        </div>
+                      )}
+                      {isActive && isFreelancer && !milestones[index].isCompleted && (
+                        <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
+                          <button
+                            onClick={() => handleAction("Complete", () => completeMilestoneTx(escrowIdNum))}
+                            disabled={!!pendingAction}
+                            className="flex-1 bg-primary text-on-primary font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                          >
+                            {pendingAction === "Complete" ? (
+                              <span className="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>
+                            ) : (
+                              <span className="material-symbols-outlined text-[20px]">check_circle</span>
+                            )}
+                            {pendingAction === "Complete" ? "Confirming..." : "Mark Complete"}
+                          </button>
                         </div>
                       )}
                     </div>
@@ -239,6 +281,78 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
               })}
             </div>
           </div>
+
+          {/* Fund Escrow (Created state) */}
+          {escrow.state === EscrowState.Created && isClient && (
+            <div className="bg-surface-container rounded-xl p-8 border border-primary/20">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white headline-font mb-1">Fund This Escrow</h3>
+                  <p className="text-sm text-on-surface-variant">
+                    Send {escrow.totalAmount} ETH to activate the contract.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleAction("Fund", () => fundEscrowTx(escrowIdNum, escrow.totalAmount))}
+                  disabled={!!pendingAction}
+                  className="bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold py-3 px-6 rounded-md flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {pendingAction === "Fund" ? (
+                    <span className="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[20px]">payments</span>
+                  )}
+                  {pendingAction === "Fund" ? "Confirming..." : `Fund ${escrow.totalAmount} ETH`}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Cancel Escrow (Created state, client only) */}
+          {escrow.state === EscrowState.Created && isClient && (
+            <div className="p-4">
+              <button
+                onClick={() => handleAction("Cancel", () => cancelEscrowTx(escrowIdNum))}
+                disabled={!!pendingAction}
+                className="text-on-surface-variant hover:text-error text-xs font-bold transition-colors disabled:opacity-50"
+              >
+                Cancel Escrow
+              </button>
+            </div>
+          )}
+
+          {/* Claim Milestone (after timeout) */}
+          {escrow.state === EscrowState.Active && isFreelancer && milestones[escrow.currentMilestone]?.isCompleted && !milestones[escrow.currentMilestone]?.isApproved && (
+            <div className="bg-surface-container rounded-xl p-6 border border-tertiary/20">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-bold text-white headline-font mb-1">Claim Milestone</h3>
+                  <p className="text-xs text-on-surface-variant">
+                    If approval timeout has passed, you can claim the milestone.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleAction("Claim", () => claimMilestoneTx(escrowIdNum))}
+                  disabled={!!pendingAction}
+                  className="bg-tertiary text-on-tertiary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {pendingAction === "Claim" ? (
+                    <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[16px]">redeem</span>
+                  )}
+                  {pendingAction === "Claim" ? "Confirming..." : "Claim"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Action Error */}
+          {actionError && (
+            <div className="p-3 bg-error/10 border border-error/20 rounded-lg">
+              <p className="text-sm text-error">{actionError}</p>
+            </div>
+          )}
         </div>
 
         {/* Side Panel (Col 4) */}

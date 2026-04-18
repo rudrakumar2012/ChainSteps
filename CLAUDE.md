@@ -22,7 +22,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Real Data Integration (Phase 3 of 5 DONE) — All pages now read from on-chain data via hooks. No more mock data. Write operations still use stubs. See `TICKETS_REAL_DATA.md` for remaining phases. Next: Phase 4 (Wire write operations — MetaMask transactions).
+Real Data Integration (Phase 4 of 5 DONE) — All read/write operations wired to real contract via MetaMask. Next: Phase 5 (Transaction toast notifications).
 
 ## Frontend Structure
 ```

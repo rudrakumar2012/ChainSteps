@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrows } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
 import { EscrowState, Dispute } from "@/types";
+import { resolveDisputeTx } from "@/lib/contract";
 
 type DisputeStatus = "under_review" | "resolved";
 
@@ -67,6 +68,23 @@ export default function DisputesPage() {
     if (activeFilter === "all") return true;
     return getDisputeStatus(d) === activeFilter;
   });
+
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  const [resolveError, setResolveError] = useState<string | null>(null);
+  const [clientPercent, setClientPercent] = useState(50);
+
+  const handleResolve = async (escrowId: string) => {
+    setResolvingId(escrowId);
+    setResolveError(null);
+    try {
+      await resolveDisputeTx(Number(escrowId), clientPercent);
+      window.location.reload();
+    } catch (err: any) {
+      setResolveError(err?.reason || err?.message || "Failed to resolve dispute");
+    } finally {
+      setResolvingId(null);
+    }
+  };
 
   const underReview = disputes.filter((d) => getDisputeStatus(d) === "under_review").length;
   const resolved = disputes.filter((d) => getDisputeStatus(d) === "resolved").length;
@@ -206,11 +224,47 @@ export default function DisputesPage() {
                         )}
                         <button
                           onClick={() => router.push(`/contracts/${dispute.escrowId}`)}
-                          className="ml-auto px-4 py-1.5 rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
+                          className="px-4 py-1.5 rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
                         >
                           View Contract
                         </button>
                       </div>
+
+                      {/* Resolve Dispute (arbitrator only) */}
+                      {address?.toLowerCase() === dispute.arbitrator.toLowerCase() && getDisputeStatus(dispute) === "under_review" && (
+                        <div className="mt-4 pt-4 bg-surface-container-low/30 -mx-4 sm:-mx-8 -mb-4 px-4 sm:px-8 pb-4 rounded-b-xl">
+                          <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">
+                            Resolve Dispute
+                          </p>
+                          <div className="flex items-center gap-4 mb-3">
+                            <label className="text-xs text-on-surface-variant">Client share:</label>
+                            <input
+                              type="range"
+                              min={0}
+                              max={100}
+                              value={clientPercent}
+                              onChange={(e) => setClientPercent(Number(e.target.value))}
+                              className="flex-1 accent-primary"
+                            />
+                            <span className="text-sm font-bold text-white headline-font w-12 text-right">{clientPercent}%</span>
+                          </div>
+                          <button
+                            onClick={() => handleResolve(dispute.escrowId)}
+                            disabled={resolvingId === dispute.escrowId}
+                            className="bg-secondary text-on-secondary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                          >
+                            {resolvingId === dispute.escrowId ? (
+                              <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                            ) : (
+                              <span className="material-symbols-outlined text-[16px]">gavel</span>
+                            )}
+                            {resolvingId === dispute.escrowId ? "Confirming..." : "Resolve"}
+                          </button>
+                          {resolveError && resolvingId === null && (
+                            <p className="text-xs text-error mt-2">{resolveError}</p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
