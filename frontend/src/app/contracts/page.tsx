@@ -16,6 +16,8 @@ const mockEscrows: Escrow[] = [
     currentMilestone: 3,
     milestoneCount: 5,
     totalAmount: "4.20",
+    arbitrator: "0x0000000000000000000000000000000000000000",
+    disputeTimeout: "0",
   },
   {
     id: "CS-881-ZQ",
@@ -25,6 +27,8 @@ const mockEscrows: Escrow[] = [
     currentMilestone: 4,
     milestoneCount: 4,
     totalAmount: "8.50",
+    arbitrator: "0x0000000000000000000000000000000000000000",
+    disputeTimeout: "0",
   },
   {
     id: "CS-772-ML",
@@ -34,6 +38,8 @@ const mockEscrows: Escrow[] = [
     currentMilestone: 2,
     milestoneCount: 3,
     totalAmount: "2.15",
+    arbitrator: "0xABC1234567890AbCdEf1234567890aBcDeF1234",
+    disputeTimeout: "1700000000",
   },
   {
     id: "CS-643-AB",
@@ -43,6 +49,8 @@ const mockEscrows: Escrow[] = [
     currentMilestone: 1,
     milestoneCount: 4,
     totalAmount: "3.75",
+    arbitrator: "0x0000000000000000000000000000000000000000",
+    disputeTimeout: "0",
   },
   {
     id: "CS-514-QR",
@@ -52,6 +60,8 @@ const mockEscrows: Escrow[] = [
     currentMilestone: 2,
     milestoneCount: 6,
     totalAmount: "6.00",
+    arbitrator: "0x0000000000000000000000000000000000000000",
+    disputeTimeout: "0",
   },
   {
     id: "CS-445-TZ",
@@ -61,6 +71,8 @@ const mockEscrows: Escrow[] = [
     currentMilestone: 3,
     milestoneCount: 3,
     totalAmount: "2.50",
+    arbitrator: "0x0000000000000000000000000000000000000000",
+    disputeTimeout: "0",
   },
 ];
 

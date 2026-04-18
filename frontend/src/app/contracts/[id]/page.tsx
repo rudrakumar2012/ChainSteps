@@ -17,6 +17,8 @@ function getMockEscrow(id: string) {
     currentMilestone: 1,
     milestoneCount: 4,
     totalAmount: "5.50",
+    arbitrator: "0x0000000000000000000000000000000000000000",
+    disputeTimeout: "0",
     title: "DEX Frontend Dev",
     description:
       "Development of a high-performance, responsive React frontend for the upcoming Genesis DEX protocol.",

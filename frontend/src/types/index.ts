@@ -3,7 +3,7 @@ export enum EscrowState {
   Active = 1,
   Disputed = 2,
   Completed = 3,
-  Cancelled = 4
+  Cancelled = 4,
 }
 
 export interface Escrow {
@@ -14,7 +14,8 @@ export interface Escrow {
   currentMilestone: number;
   milestoneCount: number;
   totalAmount: string;
-  createdAt?: string;
+  arbitrator: string;
+  disputeTimeout: string;
 }
 
 export interface Milestone {
@@ -48,4 +49,22 @@ export interface CreateEscrowFormData {
   freelancer: string;
   arbitrator?: string;
   milestones: MilestoneInput[];
+}
+
+export type TransactionStatus = "idle" | "pending" | "confirmed" | "failed";
+
+export interface TransactionState {
+  status: TransactionStatus;
+  hash: string | null;
+  error: string | null;
+}
+
+export interface Dispute {
+  escrowId: string;
+  client: string;
+  freelancer: string;
+  milestoneIndex: number;
+  milestoneDescription: string;
+  disputeTimeout: string;
+  arbitrator: string;
 }
