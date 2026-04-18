@@ -39,10 +39,11 @@ export function AppShell({ children }: AppShellProps) {
           />
         )}
 
-        {/* Sidebar — always visible on lg+, slide-in on mobile */}
+        {/* Sidebar — always visible on lg+, slide-in drawer on mobile */}
         <div
           className={`
-            fixed inset-y-0 left-0 z-50 transition-transform duration-300 lg:translate-x-0
+            fixed inset-y-0 left-0 z-50 transition-transform duration-300
+            lg:translate-x-0 lg:block
             ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           `}
         >
@@ -51,7 +52,7 @@ export function AppShell({ children }: AppShellProps) {
 
         <TopBar />
 
-        <main className="ml-0 lg:ml-64 pt-24 px-6 lg:px-8 pb-12 min-h-screen">
+        <main className="ml-0 lg:ml-64 pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8 pb-12 min-h-screen">
           {children}
         </main>
       </div>

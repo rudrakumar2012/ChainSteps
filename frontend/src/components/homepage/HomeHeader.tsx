@@ -43,11 +43,7 @@ export function HomeHeader() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="material-symbols-outlined text-on-primary text-xl">
-                account_balance_wallet
-              </span>
-            </div>
+            <img src="/logo.svg" alt="ChainSteps" className="w-10 h-10" />
             <div>
               <h1 className="text-xl font-bold tracking-tighter text-primary headline-font">
                 ChainSteps

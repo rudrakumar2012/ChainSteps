@@ -67,20 +67,18 @@ export function ConnectButton({
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container">
-          <span className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#4edea3]" />
-          <span className="text-sm font-mono text-white">{truncateAddress(address!)}</span>
-        </div>
-        <Button variant="ghost" size="sm" onClick={disconnect} className="hover:bg-error/10 hover:text-error">
-          <span className="material-symbols-outlined text-sm">logout</span>
-          Disconnect
-        </Button>
+    <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-surface-container">
+        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary shadow-[0_0_8px_#4edea3]" />
+        <span className="text-xs sm:text-sm font-mono text-white">{truncateAddress(address!)}</span>
       </div>
-      <div className="text-[10px] text-on-surface-variant mr-1">
-        Connected to MetaMask
-      </div>
+      <button
+        onClick={disconnect}
+        className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors"
+        title="Disconnect"
+      >
+        <span className="material-symbols-outlined text-lg">logout</span>
+      </button>
     </div>
   );
 }

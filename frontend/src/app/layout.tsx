@@ -20,7 +20,8 @@ export const metadata: Metadata = {
   description:
     "Trustless escrow for service contracts with milestone-based verification on Ethereum.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
+    apple: "/logo.svg",
   },
 };
 
