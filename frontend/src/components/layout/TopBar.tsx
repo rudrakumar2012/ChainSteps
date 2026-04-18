@@ -1,11 +1,13 @@
 "use client";
 
 import { useWalletContext } from "../wallet/WalletProvider";
+import { useTransactionContext } from "../tx/TransactionProvider";
 import { ConnectButton } from "../wallet/ConnectButton";
 import { useMobileNav } from "./AppShell";
 
 export function TopBar() {
   const { chainId } = useWalletContext();
+  const { pendingCount } = useTransactionContext();
   const { toggle } = useMobileNav();
   const isSepolia = chainId === 11155111;
 
@@ -34,9 +36,14 @@ export function TopBar() {
       {/* Actions */}
       <div className="flex items-center gap-3 sm:gap-6 shrink-0">
         <div className="hidden sm:flex items-center gap-4 text-on-surface-variant">
-          <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">
-            notifications
-          </span>
+          <div className="relative cursor-pointer hover:text-primary transition-colors text-on-surface-variant">
+            <span className="material-symbols-outlined">notifications</span>
+            {pendingCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error text-on-error text-[9px] font-bold flex items-center justify-center shadow-[0_0_8px_rgba(255,180,171,0.5)]">
+                {pendingCount > 9 ? "9+" : pendingCount}
+              </span>
+            )}
+          </div>
           <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">
             settings
           </span>

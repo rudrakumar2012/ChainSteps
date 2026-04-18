@@ -8,6 +8,7 @@ import { EscrowState, Milestone } from "@/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrowDetail } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
+import { useTransactionContext } from "@/components/tx";
 import {
   fundEscrowTx,
   completeMilestoneTx,
@@ -15,6 +16,7 @@ import {
   raiseDisputeTx,
   claimMilestoneTx,
   cancelEscrowTx,
+  TxHandle,
 } from "@/lib/contract";
 import { ethers } from "ethers";
 
@@ -35,6 +37,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params);
   const router = useRouter();
   const { address } = useWalletContext();
+  const { trackTx } = useTransactionContext();
   const { escrow, milestones, loading, error, refetch } = useEscrowDetail(id);
 
   if (loading) {
@@ -70,11 +73,11 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
 
   const escrowIdNum = Number(escrow.id);
 
-  const handleAction = async (label: string, fn: () => Promise<ethers.TransactionReceipt | null>) => {
+  const handleAction = async (label: string, fn: () => Promise<TxHandle>) => {
     setPendingAction(label);
     setActionError(null);
     try {
-      await fn();
+      await trackTx(label, fn);
       refetch();
     } catch (err: any) {
       setActionError(err?.reason || err?.message || `${label} failed`);

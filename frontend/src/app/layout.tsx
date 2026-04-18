@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
+import { TransactionProvider, ToastContainer } from "@/components/tx";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -41,7 +42,12 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen bg-surface text-on-surface antialiased`}
       >
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          <TransactionProvider>
+            {children}
+            <ToastContainer />
+          </TransactionProvider>
+        </WalletProvider>
       </body>
     </html>
   );

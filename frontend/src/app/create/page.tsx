@@ -8,6 +8,7 @@ import { MilestonesStep } from "@/components/create/MilestonesStep";
 import { ReviewStep } from "@/components/create/ReviewStep";
 import { CreateEscrowFormData } from "@/types";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
+import { useTransactionContext } from "@/components/tx";
 import { createEscrowTx, addMilestoneTx, fundEscrowTx } from "@/lib/contract";
 import { ethers } from "ethers";
 
@@ -34,6 +35,7 @@ function isValidAddress(address: string): boolean {
 export default function CreateEscrowPage() {
   const router = useRouter();
   const { address, isConnected } = useWalletContext();
+  const { trackTx } = useTransactionContext();
   const [currentStep, setCurrentStep] = useState<Step>("parties");
   const [formData, setFormData] = useState<CreateEscrowFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -94,7 +96,8 @@ export default function CreateEscrowPage() {
 
       // Step 1: Create escrow
       setSubmitStep("Creating escrow...");
-      const receipt = await createEscrowTx(formData.freelancer, arbitrator);
+      const createHandle = await trackTx("Create Escrow", () => createEscrowTx(formData.freelancer, arbitrator));
+      const receipt = await createHandle.wait();
       if (!receipt) throw new Error("Transaction failed");
 
       // Extract escrowId from EscrowCreated event
@@ -116,13 +119,16 @@ export default function CreateEscrowPage() {
       // Step 2: Add milestones
       for (let i = 0; i < formData.milestones.length; i++) {
         const m = formData.milestones[i];
-        setSubmitStep(`Adding milestone ${i + 1}/${formData.milestones.length}...`);
-        await addMilestoneTx(escrowId!, m.description, m.amount);
+        const label = `Add Milestone ${i + 1}/${formData.milestones.length}`;
+        setSubmitStep(label + "...");
+        const handle = await trackTx(label, () => addMilestoneTx(escrowId!, m.description, m.amount));
+        await handle.wait();
       }
 
       // Step 3: Fund escrow
       setSubmitStep("Funding escrow...");
-      await fundEscrowTx(escrowId!, totalAmount.toFixed(4));
+      const fundHandle = await trackTx("Fund Escrow", () => fundEscrowTx(escrowId!, totalAmount.toFixed(4)));
+      await fundHandle.wait();
 
       router.push(`/contracts/${escrowId}`);
     } catch (err: any) {

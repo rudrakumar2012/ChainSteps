@@ -22,7 +22,7 @@ https://github.com/rudrakumar2012/ChainSteps
 - ethers.js v6 for Web3
 
 ## Current Phase
-Real Data Integration (Phase 4 of 5 DONE) — All read/write operations wired to real contract via MetaMask. Next: Phase 5 (Transaction toast notifications).
+All 5 phases complete. Transaction toast notifications (Phase 5) implemented — global TransactionProvider tracks tx lifecycle with glass-morphism toasts and Etherscan links.
 
 ## Frontend Structure
 ```
@@ -51,9 +51,10 @@ frontend/
 │   │   ├── create/         # EscrowWizard, PartiesStep, MilestonesStep, ReviewStep
 │   │   ├── milestone/       # MilestoneTimeline
 │   │   ├── evidence/        # EvidencePanel
+│   │   ├── tx/             # TransactionProvider, TransactionToast, ToastContainer
 │   │   └── wallet/         # WalletProvider, ConnectButton
 │   ├── hooks/              # useWallet, useEscrows, useEscrowDetail, useDashboard
-│   ├── lib/                # provider.ts, contract.ts, api.ts, abi.json
+│   ├── lib/                # provider.ts, contract.ts (TxHandle), api.ts, abi.json
 │   └── types/              # Escrow, Milestone, EscrowState, TransactionStatus, Dispute
 ```
 

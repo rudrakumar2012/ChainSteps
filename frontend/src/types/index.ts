@@ -54,9 +54,13 @@ export interface CreateEscrowFormData {
 export type TransactionStatus = "idle" | "pending" | "confirmed" | "failed";
 
 export interface TransactionState {
+  id: string;
   status: TransactionStatus;
   hash: string | null;
   error: string | null;
+  label: string;
+  createdAt: number;
+  retry?: () => Promise<void>;
 }
 
 export interface Dispute {

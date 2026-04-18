@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrows } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
+import { useTransactionContext } from "@/components/tx";
 import { EscrowState, Dispute } from "@/types";
 import { resolveDisputeTx } from "@/lib/contract";
 
@@ -60,6 +61,7 @@ function truncateAddress(address: string): string {
 export default function DisputesPage() {
   const router = useRouter();
   const { address, isConnected } = useWalletContext();
+  const { trackTx } = useTransactionContext();
   const { data: escrows, loading, error } = useEscrows(isConnected ? address : undefined);
   const [activeFilter, setActiveFilter] = useState<"all" | DisputeStatus>("all");
 
@@ -77,8 +79,8 @@ export default function DisputesPage() {
     setResolvingId(escrowId);
     setResolveError(null);
     try {
-      await resolveDisputeTx(Number(escrowId), clientPercent);
-      window.location.reload();
+      await trackTx("Resolve Dispute", () => resolveDisputeTx(Number(escrowId), clientPercent));
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err: any) {
       setResolveError(err?.reason || err?.message || "Failed to resolve dispute");
     } finally {

@@ -102,14 +102,16 @@ Each phase = one commit checkpoint. Phases build sequentially.
 
 ---
 
-## Phase 5: UX Polish — Transaction Feedback
+## Phase 5: UX Polish — Transaction Feedback ✅ DONE
 
-### TICKET-RD-13: Transaction toast notifications
-**Files:** `frontend/src/components/ui/TransactionToast.tsx`, `frontend/src/lib/tx-context.tsx`
+### TICKET-RD-13: Transaction toast notifications ✅
+**Files:** `frontend/src/components/tx/TransactionProvider.tsx`, `frontend/src/components/tx/TransactionToast.tsx`, `frontend/src/components/tx/ToastContainer.tsx`
 - Create `TransactionProvider` context to track pending/confirmed/failed txs globally
 - Toast shows: pending spinner → confirmed checkmark with Etherscan link → failed X with retry
 - Auto-dismiss on success, persist on failure
 - Integrate with all write operations from Phase 4
+- TopBar notification icon shows pending tx count badge
+- Write wrappers refactored to `TxHandle` return type exposing hash before confirmation
 
 ---
 
@@ -121,4 +123,4 @@ Each phase = one commit checkpoint. Phases build sequentially.
 | 2 | RD-04, 05 | Data hooks fetch real on-chain data, backend can list escrows | ✅ |
 | 3 | RD-06, 07, 08, 09 | All pages show real data (reads), no more mock data | ✅ |
 | 4 | RD-10, 11, 12 | Full write flow — create escrows, fund, approve, dispute, claim, cancel | ✅ |
-| 5 | RD-13 | Polished tx feedback with toasts and Etherscan links |
+| 5 | RD-13 | Polished tx feedback with toasts and Etherscan links | ✅ |
