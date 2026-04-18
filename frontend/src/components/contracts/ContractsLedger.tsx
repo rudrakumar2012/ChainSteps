@@ -159,7 +159,7 @@ export function ContractsLedger({
                       )}
                     </td>
                     <td className="py-4">
-                      <span className="text-sm font-bold text-primary">
+                      <span className="text-sm font-bold text-primary headline-font">
                         {escrow.totalAmount} ETH
                       </span>
                     </td>

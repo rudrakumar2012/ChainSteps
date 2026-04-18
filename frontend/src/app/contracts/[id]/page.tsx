@@ -90,9 +90,9 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params);
   const router = useRouter();
   const escrow = getMockEscrow(id);
-  const progress = escrow.milestoneCount > 0
-    ? Math.round((escrow.currentMilestone / escrow.milestoneCount) * 100)
-    : 0;
+  const progress = Math.round(
+    (escrow.milestoneCount > 0 ? escrow.currentMilestone / escrow.milestoneCount : 0) * 100
+  );
 
   return (
     <AppShell>

@@ -146,7 +146,7 @@ export function MilestonesStep({ formData, onUpdate, errors }: MilestonesStepPro
           ))}
 
           {/* Total */}
-          <div className="flex justify-end pt-4 border-t border-white/10">
+          <div className="flex justify-end pt-4 bg-surface-container-low/30 -mx-5 -mb-5 px-5 pb-5 rounded-b-xl">
             <div className="flex items-center gap-3">
               <span className="text-xs text-on-surface-variant uppercase tracking-widest">
                 Total Escrow Value

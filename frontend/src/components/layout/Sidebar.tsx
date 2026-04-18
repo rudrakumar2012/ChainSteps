@@ -73,7 +73,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       </nav>
 
       {/* Wallet info */}
-      <div className="px-6 pt-6 mt-auto border-t border-white/5">
+      <div className="px-6 pt-6 mt-auto">
         <WalletConnection />
       </div>
     </aside>

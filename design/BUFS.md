@@ -279,46 +279,46 @@
 - **Issue:** Glass cards in design use `backdrop-filter: blur(12px)` but some components may not have it
 - **File:** Various card components
 - **Design Reference:** All design files use glassmorphism with `backdrop-filter: blur(12px)` and `background: rgba(23, 31, 51, 0.7)`
-- **Status:** To Fix
-- **Fix:** Ensure all glass cards use proper backdrop blur and semi-transparent backgrounds
+- **Status:** ✅ DONE
+- **Fix:** Already resolved — `.glass-card` CSS class in globals.css includes `backdrop-filter: blur(12px)` and proper semi-transparent background.
 
 **TICKET-019: Typography Hierarchy Not Followed**
 - **Issue:** Display font (Space Grotesk) should be used for milestone amounts and high-level summaries
 - **Design Reference:** `design/chainsteps_protocol/DESIGN.md` Section 3: Typography
-- **Status:** To Fix
-- **Fix:** Review and update typography - use `font-headline` (Space Grotesk) for display text, `font-body` (Inter) for body
+- **Status:** ✅ DONE
+- **Fix:** Added `headline-font` class to all ETH amount displays in ContractRow, ContractsLedger, ContractDetail, MilestoneTimeline, ReviewStep, and contracts page.
 
 **TICKET-020: No "No-Line" Rule Followed**
 - **Issue:** Design system prohibits 1px borders for sectioning - use background shifts instead
 - **Design Reference:** `design/chainsteps_protocol/DESIGN.md` Section 2: "The 'No-Line' Rule"
-- **Status:** To Fix
-- **Fix:** Replace divider lines with tonal background differences
+- **Status:** ✅ DONE
+- **Fix:** Replaced section divider borders with tonal background shifts (`bg-surface-container-low/30` with negative margins for full-bleed effect) in Sidebar, MilestoneTimeline, ContractDetail, EscrowWizard, MilestonesStep, ReviewStep, create page summary, and homepage footer.
 
 ### CODE QUALITY / LOGIC ISSUES (LOW PRIORITY)
 
 **TICKET-021: Unused `currentAddress` Prop**
 - **Issue:** `currentAddress?: string | null` declared in MilestoneTimeline props but never used
 - **File:** `frontend/src/components/milestone/MilestoneTimeline.tsx:12`
-- **Status:** To Fix
-- **Fix:** Use `currentAddress` to determine button visibility or remove if truly not needed
+- **Status:** ✅ DONE
+- **Fix:** Removed unused `currentAddress` prop from MilestoneTimelineProps interface.
 
 **TICKET-022: Unused Import**
 - **Issue:** `EscrowWithMilestones` imported but never used
 - **File:** `frontend/src/components/contracts/ContractDetail.tsx:3`
-- **Status:** To Fix
-- **Fix:** Remove unused import
+- **Status:** ✅ DONE
+- **Fix:** Removed unused `EscrowWithMilestones` import.
 
 **TICKET-023: Inconsistent Status Colors**
 - **Issue:** "funded" and "unfunded" status in StatusBadge use hardcoded slate colors instead of design system colors
 - **File:** `frontend/src/components/ui/StatusBadge.tsx:32-42`
-- **Status:** To Fix
-- **Fix:** Update to use primary/secondary palette or proper semantic colors per design system
+- **Status:** ✅ DONE (fixed as part of TICKET-013/014)
+- **Fix:** Updated funded/unfunded to use design system outline-variant colors.
 
 **TICKET-024: Division by Zero Fragility**
 - **Issue:** Progress calculation checks `escrow.milestoneCount > 0` but pattern is fragile
 - **File:** `frontend/src/components/contracts/ContractRow.tsx:38-40`, `ContractDetail.tsx:56-58`
-- **Status:** To Fix
-- **Fix:** Ensure check happens before any calculations, or use optional chaining
+- **Status:** ✅ DONE
+- **Fix:** Consolidated to single expression with inline ternary guard: `Math.round((milestoneCount > 0 ? currentMilestone / milestoneCount : 0) * 100)`
 
 ---
 
@@ -389,17 +389,17 @@
 ### Phase 5: Design System Compliance
 | Order | Ticket | Title | Blocking |
 |-------|--------|-------|----------|
-| 18 | TICKET-018 | Add backdrop blur to glass cards | None |
-| 19 | TICKET-019 | Fix typography hierarchy | None |
-| 20 | TICKET-020 | Implement "No-Line" rule | None |
+| 18 | TICKET-018 | Add backdrop blur to glass cards | ✅ DONE |
+| 19 | TICKET-019 | Fix typography hierarchy | ✅ DONE |
+| 20 | TICKET-020 | Implement "No-Line" rule | ✅ DONE |
 
 ### Phase 6: Code Quality
 | Order | Ticket | Title | Blocking |
 |-------|--------|-------|----------|
-| 21 | TICKET-021 | Remove unused prop / use currentAddress | None |
-| 22 | TICKET-022 | Remove unused import | None |
-| 23 | TICKET-023 | Fix inconsistent status colors | None |
-| 24 | TICKET-024 | Fix division by zero | None |
+| 21 | TICKET-021 | Remove unused prop / use currentAddress | ✅ DONE |
+| 22 | TICKET-022 | Remove unused import | ✅ DONE |
+| 23 | TICKET-023 | Fix inconsistent status colors | ✅ DONE |
+| 24 | TICKET-024 | Fix division by zero | ✅ DONE |
 
 ---
 

@@ -14,7 +14,7 @@ export default function HomePage() {
         <HowItWorks />
         <TrustIndicators />
         {/* Footer */}
-        <footer className="py-12 border-t border-white/5 bg-surface-container-low">
+        <footer className="py-12 bg-surface-container-low">
           <div className="container mx-auto px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-3">

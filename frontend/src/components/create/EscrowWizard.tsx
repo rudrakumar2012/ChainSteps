@@ -190,7 +190,7 @@ export function EscrowWizard({ clientAddress, onSubmit, onCancel }: EscrowWizard
       )}
 
       {/* Navigation */}
-      <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/10">
+      <div className="flex justify-between items-center mt-8 pt-6 bg-surface-container-low/30 -mx-6 -mb-6 px-6 pb-6 rounded-b-2xl">
         <Button variant="ghost" size="md" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>

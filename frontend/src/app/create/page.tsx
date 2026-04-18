@@ -310,7 +310,7 @@ export default function CreateEscrowPage() {
                   <p className="text-sm font-medium text-on-surface">~ 0.0042 ETH</p>
                 </div>
               </div>
-              <div className="mt-6 pt-6 border-t border-white/5 flex items-center space-x-4">
+              <div className="mt-6 pt-6 bg-surface-container-low/30 -mx-8 -mb-8 px-8 pb-6 rounded-b-xl flex items-center space-x-4">
                 <span className="material-symbols-outlined text-secondary">verified_user</span>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   Tokens will be held in the{" "}

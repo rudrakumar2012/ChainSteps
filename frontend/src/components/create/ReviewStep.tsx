@@ -79,7 +79,7 @@ export function ReviewStep({ formData, clientAddress }: ReviewStepProps) {
               <div className="flex-1">
                 <p className="text-sm text-white">{milestone.description}</p>
               </div>
-              <div className="text-sm font-bold text-primary">
+              <div className="text-sm font-bold text-primary headline-font">
                 {parseFloat(milestone.amount).toFixed(2)} ETH
               </div>
             </div>
@@ -87,7 +87,7 @@ export function ReviewStep({ formData, clientAddress }: ReviewStepProps) {
         </div>
 
         {/* Total */}
-        <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/10">
+        <div className="flex justify-between items-center mt-4 pt-4 bg-surface-container-low/30 -mx-5 -mb-5 px-5 pb-5 rounded-b-xl">
           <span className="text-sm font-bold text-white uppercase tracking-widest">
             Total Escrow Value
           </span>

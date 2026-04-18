@@ -35,9 +35,9 @@ function getRoleBadge(role: "client" | "freelancer") {
 
 export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) {
   const status = getEscrowStatus(escrow);
-  const progress = escrow.milestoneCount > 0
-    ? Math.round((escrow.currentMilestone / escrow.milestoneCount) * 100)
-    : 0;
+  const progress = Math.round(
+    (escrow.milestoneCount > 0 ? escrow.currentMilestone / escrow.milestoneCount : 0) * 100
+  );
 
   return (
     <div
@@ -68,7 +68,7 @@ export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) 
           <p className="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">
             Total Value
           </p>
-          <p className="text-sm font-bold text-primary">
+          <p className="text-sm font-bold text-primary headline-font">
             {escrow.totalAmount} ETH
           </p>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Escrow, EscrowWithMilestones, EscrowState, Milestone } from "@/types";
+import { Escrow, EscrowState, Milestone } from "@/types";
 import { StatusBadge } from "../ui/StatusBadge";
 import { ProgressBar } from "../ui/ProgressBar";
 import { Button } from "../ui/Button";
@@ -53,9 +53,9 @@ export function ContractDetail({
 }: ContractDetailProps) {
   const isClient = currentAddress?.toLowerCase() === escrow.client.toLowerCase();
   const isFreelancer = currentAddress?.toLowerCase() === escrow.freelancer.toLowerCase();
-  const progress = escrow.milestoneCount > 0
-    ? Math.round((escrow.currentMilestone / escrow.milestoneCount) * 100)
-    : 0;
+  const progress = Math.round(
+    (escrow.milestoneCount > 0 ? escrow.currentMilestone / escrow.milestoneCount : 0) * 100
+  );
 
   const totalFunded = milestones.reduce((sum, m) =>
     m.isApproved ? sum + parseFloat(m.amount) : sum, 0
@@ -161,12 +161,12 @@ export function ContractDetail({
                           : "Not Started"}
                       </p>
                     </div>
-                    <p className="text-lg font-bold text-primary">{milestone.amount} ETH</p>
+                    <p className="text-lg font-bold text-primary headline-font">{milestone.amount} ETH</p>
                   </div>
 
                   {/* Action buttons for current milestone */}
                   {index === escrow.currentMilestone && escrow.state === EscrowState.Active && (
-                    <div className="flex gap-2 mt-3 pt-3 border-t border-white/10">
+                    <div className="flex gap-2 mt-3 pt-3 bg-surface-container-low/30 -mx-4 -mb-4 px-4 pb-4 rounded-b-xl">
                       {isFreelancer && !milestone.isCompleted && !milestone.isApproved && (
                         <Button
                           variant="secondary"

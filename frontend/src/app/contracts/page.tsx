@@ -283,7 +283,7 @@ export default function ContractsPage() {
                         </span>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="text-sm font-bold text-white">{escrow.totalAmount} ETH</p>
+                        <p className="text-sm font-bold text-white headline-font">{escrow.totalAmount} ETH</p>
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center space-x-2">

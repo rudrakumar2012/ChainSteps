@@ -9,7 +9,6 @@ interface MilestoneTimelineProps {
   onApprove?: (index: number) => void;
   onComplete?: (index: number) => void;
   onDispute?: (index: number) => void;
-  currentAddress?: string | null;
   isClient?: boolean;
   isFreelancer?: boolean;
 }
@@ -119,7 +118,7 @@ export function MilestoneTimeline({
                     </div>
                     <p className="text-base font-medium text-white">{milestone.description}</p>
                   </div>
-                  <p className="text-xl font-bold text-primary">{milestone.amount} ETH</p>
+                  <p className="text-xl font-bold text-primary headline-font">{milestone.amount} ETH</p>
                 </div>
 
                 {/* State indicator */}
@@ -145,7 +144,7 @@ export function MilestoneTimeline({
 
                 {/* Action buttons for current milestone */}
                 {isCurrentMilestone && state !== "completed" && (
-                  <div className="flex flex-wrap gap-2 pt-3 border-t border-white/10">
+                  <div className="flex flex-wrap gap-2 pt-3 mt-3 bg-surface-container-low/30 -mx-4 -mb-4 px-4 pb-4 rounded-b-xl">
                     {isFreelancer && state !== "in_review" && (
                       <Button variant="secondary" size="sm" onClick={() => onComplete?.(index)}>
                         <span className="material-symbols-outlined text-sm">check_circle</span>
