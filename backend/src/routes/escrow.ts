@@ -5,19 +5,11 @@ import {
   getApprovalTimeout,
   getAllEscrows,
   getAllMilestones,
-  createEscrow,
-  addMilestone,
-  fundEscrow,
-  completeMilestone,
-  approveMilestone,
-  raiseDispute,
-  resolveDispute,
-  cancelEscrow,
-  claimMilestone,
 } from '../services/web3.js';
-import { uploadToIPFS } from '../services/ipfs.js';
 
 const router = Router();
+
+// ── Read endpoints (active) ──────────────────────────────────────────
 
 // GET /escrow - List all escrows (optional ?address= filter)
 router.get('/', async (req, res) => {
@@ -77,143 +69,6 @@ router.get('/:id/timeout', async (req, res) => {
   }
 });
 
-// POST /escrow - Create new escrow
-router.post('/', async (req, res) => {
-  try {
-    const { freelancer, arbitrator } = req.body;
-    if (!freelancer) {
-      return res.status(400).json({ error: 'freelancer address required' });
-    }
-    const escrowId = await createEscrow(freelancer, arbitrator);
-    res.status(201).json({ escrowId });
-  } catch (error: any) {
-    console.error('Error creating escrow:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /escrow/:id/milestone - Add milestone
-router.post('/:id/milestone', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    const { description, amount } = req.body;
-    if (!description || !amount) {
-      return res.status(400).json({ error: 'description and amount required' });
-    }
-    await addMilestone(escrowId, description, amount);
-    res.status(201).json({ success: true });
-  } catch (error: any) {
-    console.error('Error adding milestone:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /escrow/:id/fund - Fund escrow
-router.post('/:id/fund', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    const { amount } = req.body;
-    if (!amount) {
-      return res.status(400).json({ error: 'amount required' });
-    }
-    await fundEscrow(escrowId, amount);
-    res.status(200).json({ success: true });
-  } catch (error: any) {
-    console.error('Error funding escrow:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /escrow/:id/complete - Complete milestone
-router.post('/:id/complete', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    await completeMilestone(escrowId);
-    res.status(200).json({ success: true });
-  } catch (error: any) {
-    console.error('Error completing milestone:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /escrow/:id/approve - Approve milestone
-router.post('/:id/approve', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    await approveMilestone(escrowId);
-    res.status(200).json({ success: true });
-  } catch (error: any) {
-    console.error('Error approving milestone:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /escrow/:id/dispute - Raise dispute
-router.post('/:id/dispute', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    await raiseDispute(escrowId);
-    res.status(200).json({ success: true });
-  } catch (error: any) {
-    console.error('Error raising dispute:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /escrow/:id/resolve - Resolve dispute
-router.post('/:id/resolve', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    const { clientPercent } = req.body;
-    if (clientPercent === undefined) {
-      return res.status(400).json({ error: 'clientPercent required' });
-    }
-    await resolveDispute(escrowId, clientPercent);
-    res.status(200).json({ success: true });
-  } catch (error: any) {
-    console.error('Error resolving dispute:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /escrow/:id/evidence - Upload milestone evidence to IPFS
-router.post('/:id/evidence', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    const { file } = req.body;
-    if (!file) {
-      return res.status(400).json({ error: 'No file provided' });
-    }
-    const buffer = Buffer.from(file.data, 'base64');
-    const cid = await uploadToIPFS(buffer);
-    res.json({ cid });
-  } catch (error: any) {
-    console.error('Error uploading to IPFS:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // GET /escrow/:id/milestones - Get all milestones for an escrow
 router.get('/:id/milestones', async (req, res) => {
   try {
@@ -229,32 +84,41 @@ router.get('/:id/milestones', async (req, res) => {
   }
 });
 
-// POST /escrow/:id/cancel - Cancel escrow (client only, Created state)
-router.post('/:id/cancel', async (req, res) => {
-  try {
-    const escrowId = parseInt(req.params.id as string);
-    if (isNaN(escrowId)) {
-      return res.status(400).json({ error: 'Invalid escrow ID' });
-    }
-    await cancelEscrow(escrowId);
-    res.json({ success: true });
-  } catch (error: any) {
-    console.error('Error cancelling escrow:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+// ── Write endpoints (DEPRECATED — frontend uses MetaMask directly) ───
+// Backend signing undermines contract access control. These return 410 Gone.
 
-// POST /escrow/:id/claim - Claim milestone after timeout
-router.post('/:id/claim', async (req, res) => {
+const DEPRECATION_MSG = 'Deprecated: use MetaMask to send transactions directly from the frontend. Backend write endpoints are disabled because server-side signing undermines contract access control.';
+
+router.post('/', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+router.post('/:id/milestone', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+router.post('/:id/fund', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+router.post('/:id/complete', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+router.post('/:id/approve', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+router.post('/:id/dispute', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+// NOTE: If re-enabling resolve, validate clientPercent is a number in [0, 100]
+router.post('/:id/resolve', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+router.post('/:id/cancel', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+router.post('/:id/claim', (req, res) => res.status(410).json({ error: DEPRECATION_MSG }));
+
+// POST /escrow/:id/evidence - Upload milestone evidence to IPFS
+// NOTE: This is the only write endpoint kept active (IPFS upload is off-chain).
+// If you have a Pinata/Web3.Storage key, replace the IPFS provider in services/ipfs.ts.
+router.post('/:id/evidence', async (req, res) => {
   try {
     const escrowId = parseInt(req.params.id as string);
     if (isNaN(escrowId)) {
       return res.status(400).json({ error: 'Invalid escrow ID' });
     }
-    await claimMilestone(escrowId);
-    res.json({ success: true });
+    const { file } = req.body;
+    if (!file) {
+      return res.status(400).json({ error: 'No file provided' });
+    }
+    const { uploadToIPFS } = await import('../services/ipfs.js');
+    const buffer = Buffer.from(file.data, 'base64');
+    const cid = await uploadToIPFS(buffer);
+    res.json({ cid });
   } catch (error: any) {
-    console.error('Error claiming milestone:', error);
+    console.error('Error uploading to IPFS:', error);
     res.status(500).json({ error: error.message });
   }
 });

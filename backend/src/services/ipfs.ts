@@ -1,26 +1,43 @@
-import { create } from 'ipfs-http-client';
+// IPFS upload via Pinata API
+// Set PINATA_JWT in .env for authentication.
+// Falls back to a public gateway for read operations.
 
-// Create IPFS client lazily to avoid ESM import issues
-let ipfsClient: Awaited<ReturnType<typeof create>> | null = null;
+const PINATA_API = 'https://api.pinata.cloud';
 
-async function getIpfsClient() {
-  if (!ipfsClient) {
-    ipfsClient = create({ url: 'https://ipfs.infura.io:5001' });
+function getPinataJwt(): string {
+  const jwt = process.env.PINATA_JWT;
+  if (!jwt) {
+    throw new Error('PINATA_JWT environment variable is required for IPFS uploads. Get one at https://pinata.cloud');
   }
-  return ipfsClient;
+  return jwt;
 }
 
 export async function uploadToIPFS(file: Buffer): Promise<string> {
-  const ipfs = await getIpfsClient();
-  const result = await ipfs.add(file);
-  return result.cid.toString();
+  const jwt = getPinataJwt();
+
+  const formData = new FormData();
+  formData.append('file', new Blob([new Uint8Array(file)]), 'evidence');
+
+  const res = await fetch(`${PINATA_API}/pinning/pinFileToIPFS`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${jwt}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Pinata upload failed (${res.status}): ${text}`);
+  }
+
+  const data = await res.json() as { IpfsHash: string };
+  return data.IpfsHash;
 }
 
 export async function getFromIPFS(cid: string): Promise<Uint8Array> {
-  const ipfs = await getIpfsClient();
-  const chunks = [];
-  for await (const chunk of ipfs.cat(cid)) {
-    chunks.push(chunk);
+  const res = await fetch(`https://gateway.pinata.cloud/ipfs/${cid}`);
+  if (!res.ok) {
+    throw new Error(`IPFS fetch failed (${res.status})`);
   }
-  return new Uint8Array(Buffer.concat(chunks));
+  const buffer = Buffer.from(await res.arrayBuffer());
+  return new Uint8Array(buffer);
 }

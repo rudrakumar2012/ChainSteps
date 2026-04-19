@@ -11,10 +11,20 @@ async function main() {
   const address = await contract.getAddress();
   console.log(`Contract deployed to: ${address}`);
 
-  // Save deployment address
+  // Save deployment address — replace existing CONTRACT_ADDRESS if present
   const fs = await import("fs");
-  const envContent = `\nCONTRACT_ADDRESS=${address}\n`;
-  fs.appendFileSync(".env.local", envContent);
+  const path = await import("path");
+  const envPath = path.resolve(".env.local");
+
+  let envContent = "";
+  if (fs.existsSync(envPath)) {
+    envContent = fs.readFileSync(envPath, "utf8");
+    envContent = envContent.replace(/^CONTRACT_ADDRESS=.*$/m, `CONTRACT_ADDRESS=${address}`);
+  }
+  if (!envContent.includes("CONTRACT_ADDRESS=")) {
+    envContent += `\nCONTRACT_ADDRESS=${address}\n`;
+  }
+  fs.writeFileSync(envPath, envContent);
   console.log("Deployment address saved to .env.local");
 }
 
