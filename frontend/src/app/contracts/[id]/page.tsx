@@ -76,7 +76,8 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     setPendingAction(label);
     setActionError(null);
     try {
-      await trackTx(label, fn);
+      const handle = await trackTx(label, fn);
+      await handle.wait();
       refetch();
     } catch (err: any) {
       setActionError(err?.reason || err?.message || `${label} failed`);
@@ -261,7 +262,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                           </button>
                         </div>
                       )}
-                      {isActive && isFreelancer && !milestones[index].isCompleted && (
+                      {isFunded && isFreelancer && !milestones[index].isCompleted && (
                         <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
                           <button
                             onClick={() => handleAction("Complete", () => completeMilestoneTx(escrowIdNum))}
@@ -275,14 +276,10 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                             )}
                             {pendingAction === "Complete" ? "Confirming..." : "Mark Complete"}
                           </button>
-                        </div>
-                      )}
-                      {isActive && isFreelancer && milestones[index].isCompleted && !milestones[index].isApproved && (
-                        <div className="p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
                           <button
                             onClick={() => handleAction("Dispute", () => raiseDisputeTx(escrowIdNum))}
                             disabled={!!pendingAction}
-                            className="border border-error/50 text-error font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:bg-error/10 active:scale-[0.98] transition-all disabled:opacity-50"
+                            className="flex-1 border border-error/50 text-error font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:bg-error/10 active:scale-[0.98] transition-all disabled:opacity-50"
                           >
                             <span className="material-symbols-outlined text-[20px]">warning</span>
                             Initiate Dispute

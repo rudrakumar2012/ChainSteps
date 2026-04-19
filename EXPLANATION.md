@@ -333,27 +333,24 @@ Evidence files (screenshots, documents) are stored on IPFS via the backend API (
 ### Deployment
 
 - **Network:** Ethereum Sepolia testnet
-- **Contract address:** `0x7b2D41F3A7592c55CB73502ddECf8F84289e9021`
+- **Contract address:** `0xD518149F0b1e50E3486C32A295809a65BFF40DE0`
 - **Deploy script:** `scripts/deploy.ts`
 
 ### Testing
 
-Tests are in `test/Escrow.ts` (46 tests) covering happy paths and edge cases for all major functions.
+Tests are in `test/Escrow.ts` (52 tests) covering happy paths and edge cases for all major functions.
 
 ### Backend API
 
-The Express.js backend (port 3001) wraps contract calls and provides off-chain storage/IPFS:
+The Express.js backend (port 3001) provides read-only contract access and IPFS uploads. Write endpoints return 410 Gone — all transactions are sent via MetaMask from the frontend:
 
 ```
-GET  /escrow/:id
-GET  /escrow/:id/milestone/:milestoneId
-POST /escrow                    (create)
-POST /escrow/:id/fund           (fund)
-POST /escrow/:id/complete       (completeMilestone)
-POST /escrow/:id/approve        (approveMilestone)
-POST /escrow/:id/dispute        (raiseDispute)
-POST /escrow/:id/resolve        (resolveDispute)
-POST /escrow/:id/evidence       (IPFS upload)
+GET  /escrow                     (list all, optional ?address= filter)
+GET  /escrow/:id                 (escrow details)
+GET  /escrow/:id/milestone/:id    (milestone details)
+GET  /escrow/:id/milestones      (all milestones)
+GET  /escrow/:id/timeout         (approval timeout)
+POST /escrow/:id/evidence        (IPFS upload via Pinata)
 ```
 
 ### Frontend
@@ -443,8 +440,8 @@ ChainSteps is an excellent capstone project for a Solidity course because it tou
 
 #### Code Complexity
 
-- Contract: ~250 lines, single file, no external dependencies beyond OpenZeppelin
-- Tests: 46 tests covering all functions and edge cases
+- Contract: ~280 lines, single file, no external dependencies beyond OpenZeppelin
+- Tests: 52 tests covering all functions and edge cases
 - Backend: ~500 lines TypeScript, standard Express patterns
 - Frontend: ~1500 lines React/TypeScript, standard component patterns
 

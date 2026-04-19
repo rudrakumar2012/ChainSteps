@@ -9,10 +9,9 @@ https://github.com/rudrakumar2012/ChainSteps
 ## Key Files
 - `contracts/DecentralizedMilestoneEscrow.sol` - Main smart contract
 - `hardhat.config.cjs` - Hardhat configuration
-- `test/Escrow.ts` - Contract tests (46 tests)
-- `scripts/deploy.ts` - Deployment script
+- `test/Escrow.ts` - Contract tests (52 tests)
+- `scripts/deploy.ts` - Deployment script (replaces CONTRACT_ADDRESS in .env.local)
 - `backend/` - Express.js API server
-- `TICKETS_REAL_DATA.md` - Real data integration tickets (active work tracker)
 - `EXPLANATION.md` - Project explanation (for submission/report)
 
 ## Tech Stack
@@ -20,9 +19,6 @@ https://github.com/rudrakumar2012/ChainSteps
 - Ethereum Sepolia testnet
 - Next.js (frontend), Node.js/Express (backend)
 - ethers.js v6 for Web3
-
-## Current Phase
-Fullstack audit in progress. Phases A (Crash Bugs) and B (Data Correctness) complete. Phase C (UX/Accessibility), D (Code Quality), and E (Backend Cleanup) remain. See `AUDIT_FIX_PLAN.md` for details.
 
 ## Frontend Structure
 ```
@@ -33,7 +29,7 @@ frontend/
 │   │   ├── layout.tsx      # Root layout with fonts
 │   │   ├── page.tsx        # Homepage (landing page)
 │   │   ├── dashboard/
-│   │   │   └── page.tsx    # Dashboard home (moved from root)
+│   │   │   └── page.tsx    # Dashboard home
 │   │   ├── contracts/
 │   │   │   ├── page.tsx    # My Contracts / Ledger page
 │   │   │   └── [id]/
@@ -45,7 +41,7 @@ frontend/
 │   ├── components/
 │   │   ├── ui/             # GlassCard, Button, StatusBadge, ProgressBar
 │   │   ├── layout/         # Sidebar, TopBar, AppShell (with WalletProvider)
-│   │   ├── homepage/       # HomeHeader, Hero, FeatureGrid, HowItWorks, TrustIndicators, BlockchainCube
+│   │   ├── homepage/       # HomeHeader, Hero, FeatureGrid, HowItWorks, TrustIndicators, BlockchainCube, HomepageStatsProvider
 │   │   ├── dashboard/      # Dashboard, StatsCard
 │   │   ├── contracts/      # ContractRow, ContractsGrid, ContractsLedger, ContractDetail, CreateNewCard
 │   │   ├── create/         # EscrowWizard, PartiesStep, MilestonesStep, ReviewStep
@@ -62,8 +58,6 @@ frontend/
 - "The Architectural Ledger" - dark fintech theme
 - Surface: #0b1326, Primary: #4cd7f6, Secondary: #4edea3
 - Typography: Space Grotesk (headlines), Inter (body)
-- See `AUDIT_FIX_PLAN.md` for active audit work
-- See `TICKETS_REAL_DATA.md` for completed real-data integration phases
 
 ## Backend Structure
 ```
@@ -71,8 +65,8 @@ backend/
 ├── src/
 │   ├── index.ts        # Express server (port 3001)
 │   ├── config/         # Environment config
-│   ├── routes/         # API routes
-│   ├── services/       # Web3, IPFS, notifications
+│   ├── routes/         # API routes (write endpoints return 410 Gone, only reads + evidence upload active)
+│   ├── services/       # Web3 (reads), IPFS (Pinata), notifications
 │   └── types/          # TypeScript types
 ```
 
@@ -80,17 +74,14 @@ backend/
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check |
+| GET | `/escrow` | List all escrows (optional `?address=` filter) |
 | GET | `/escrow/:id` | Get escrow details |
 | GET | `/escrow/:id/milestone/:milestoneId` | Get milestone details |
+| GET | `/escrow/:id/milestones` | Get all milestones for an escrow |
 | GET | `/escrow/:id/timeout` | Get approval timeout |
-| POST | `/escrow` | Create new escrow |
-| POST | `/escrow/:id/milestone` | Add milestone |
-| POST | `/escrow/:id/fund` | Fund escrow |
-| POST | `/escrow/:id/complete` | Complete milestone |
-| POST | `/escrow/:id/approve` | Approve milestone |
-| POST | `/escrow/:id/dispute` | Raise dispute |
-| POST | `/escrow/:id/resolve` | Resolve dispute |
-| POST | `/escrow/:id/evidence` | Upload to IPFS |
+| POST | `/escrow/:id/evidence` | Upload to IPFS (Pinata) |
+
+All other POST endpoints return 410 Gone — frontend uses MetaMask directly.
 
 ## Running Backend
 ```bash
@@ -98,11 +89,12 @@ cd backend && npm install && npm run dev
 ```
 
 ## Deployed Contract
-Sepolia testnet: `0x7b2D41F3A7592c55CB73502ddECf8F84289e9021`
+Sepolia testnet: `0xD518149F0b1e50E3486C32A295809a65BFF40DE0`
 
 ## Important Notes
 - Hardhat config uses `.cjs` extension (ESM project with CommonJS config)
 - OpenZeppelin v5 moved ReentrancyGuard to `utils/ReentrancyGuard.sol`
 - Tests use default import: `import pkg from 'hardhat'; const { ethers } = pkg;`
 - Use `npx hardhat compile` to compile contracts
-- Use `npx hardhat test` to run tests
+- Use `npx hardhat test` to run tests (52 tests)
+- IPFS uploads require `PINATA_JWT` in backend `.env`

@@ -15,7 +15,7 @@ ChainSteps enables clients and freelancers to create escrow contracts with miles
 
 ## Deployed Contract
 
-Sepolia testnet: `0x7b2D41F3A7592c55CB73502ddECf8F84289e9021`
+Sepolia testnet: `0xD518149F0b1e50E3486C32A295809a65BFF40DE0`
 
 ## Getting Started
 
@@ -45,12 +45,12 @@ cd frontend && npm install && npm run dev
 
 ```
 ├── contracts/          # Solidity smart contract
-├── test/               # Contract tests (46 tests)
+├── test/               # Contract tests (52 tests)
 ├── scripts/            # Deployment script
-├── backend/            # Express.js API server
+├── backend/            # Express.js API server (read-only + IPFS upload)
 │   └── src/
 │       ├── routes/     # API endpoints
-│       ├── services/   # Web3, IPFS, notifications
+│       ├── services/   # Web3 (reads), IPFS (Pinata)
 │       └── types/      # TypeScript types
 ├── frontend/           # Next.js dApp
 │   └── src/

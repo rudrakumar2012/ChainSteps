@@ -83,7 +83,8 @@ export default function DisputesPage() {
     setResolveErrors((prev) => ({ ...prev, [escrowId]: null }));
     try {
       const pct = getClientPercent(escrowId);
-      await trackTx("Resolve Dispute", () => resolveDisputeTx(Number(escrowId), pct));
+      const handle = await trackTx("Resolve Dispute", () => resolveDisputeTx(Number(escrowId), pct));
+      await handle.wait();
       refetch();
     } catch (err: any) {
       setResolveErrors((prev) => ({ ...prev, [escrowId]: err?.reason || err?.message || "Failed to resolve dispute" }));
