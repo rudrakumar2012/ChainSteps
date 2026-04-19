@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { GlassCard } from "../ui/GlassCard";
-import { useHomepageStats } from "@/hooks/useHomepageStats";
+import { useHomepageStatsContext } from "./HomepageStatsProvider";
 
 const badges = [
   { label: "Non-Custodial", icon: "shield" },
@@ -37,7 +37,7 @@ function StatSkeleton() {
 }
 
 export function TrustIndicators() {
-  const { stats, loading, error } = useHomepageStats();
+  const { stats, loading, error } = useHomepageStatsContext();
 
   const indicators = [
     {

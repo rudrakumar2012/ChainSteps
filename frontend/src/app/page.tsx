@@ -3,16 +3,19 @@ import { Hero } from "@/components/homepage/Hero";
 import { FeatureGrid } from "@/components/homepage/FeatureGrid";
 import { HowItWorks } from "@/components/homepage/HowItWorks";
 import { TrustIndicators } from "@/components/homepage/TrustIndicators";
+import { HomepageStatsProvider } from "@/components/homepage/HomepageStatsProvider";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-surface">
       <HomeHeader />
       <main>
-        <Hero />
-        <FeatureGrid />
-        <HowItWorks />
-        <TrustIndicators />
+        <HomepageStatsProvider>
+          <Hero />
+          <FeatureGrid />
+          <HowItWorks />
+          <TrustIndicators />
+        </HomepageStatsProvider>
         {/* Footer */}
         <footer className="py-12 bg-surface-container-low">
           <div className="container mx-auto px-6">

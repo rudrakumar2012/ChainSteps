@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { resetProvider } from "@/lib/provider";
 
 declare global {
@@ -20,6 +21,7 @@ interface WalletState {
 const SEPOLIA_CHAIN_ID = 11155111;
 
 export function useWallet() {
+  const router = useRouter();
   const [state, setState] = useState<WalletState>({
     address: null,
     chainId: null,
@@ -113,9 +115,6 @@ export function useWallet() {
         error: "MetaMask is not detected in the browser",
         isConnecting: false,
       }));
-      if (typeof window !== "undefined") {
-        alert("MetaMask is not detected in the browser");
-      }
     }
   };
 
@@ -166,7 +165,7 @@ export function useWallet() {
       const currentPath = window.location.pathname;
       const protectedPaths = ["/dashboard", "/contracts", "/create", "/disputes"];
       if (protectedPaths.some(path => currentPath.startsWith(path))) {
-        window.location.href = "/";
+        router.push("/");
       }
     }
   };

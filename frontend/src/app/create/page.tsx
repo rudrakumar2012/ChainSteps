@@ -179,7 +179,7 @@ export default function CreateEscrowPage() {
           <h1 className="headline-font text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
             New Escrow
           </h1>
-          <span className="text-primary headline-font text-xl opacity-50">#0042</span>
+          <span className="text-primary headline-font text-xl opacity-50">New</span>
         </div>
         <p className="text-on-surface-variant max-w-xl text-lg leading-relaxed">
           Establish a trustless agreement by defining clear milestones and locking
@@ -373,7 +373,7 @@ export default function CreateEscrowPage() {
                   <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
                     Network Fee
                   </p>
-                  <p className="text-sm font-medium text-on-surface">~ 0.0042 ETH</p>
+                  <p className="text-sm font-medium text-on-surface">~ 0.01 ETH</p>
                 </div>
               </div>
               <div className="mt-6 pt-6 bg-surface-container-low/30 -mx-8 -mb-8 px-8 pb-6 rounded-b-xl flex items-center space-x-4">

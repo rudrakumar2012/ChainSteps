@@ -5,7 +5,7 @@ import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWalletContext } from "../wallet/WalletProvider";
-import { useHomepageStats } from "@/hooks/useHomepageStats";
+import { useHomepageStatsContext } from "./HomepageStatsProvider";
 import { BlockchainCube } from "./BlockchainCube";
 
 function StatValue({ value, suffix, loading, error }: { value: string; suffix?: string; loading: boolean; error: string | null }) {
@@ -19,7 +19,7 @@ export function Hero() {
   const { isConnected, connect } = useWalletContext();
   const router = useRouter();
   const [wantsToLaunch, setWantsToLaunch] = useState(false);
-  const { stats, loading, error } = useHomepageStats();
+  const { stats, loading, error } = useHomepageStatsContext();
 
   useEffect(() => {
     if (isConnected && wantsToLaunch) {

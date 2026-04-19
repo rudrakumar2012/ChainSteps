@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { fetchAllEscrowsPublic } from "@/lib/contract";
+import { fetchAllEscrows } from "@/lib/contract";
 import type { DashboardStats, Escrow } from "@/types";
 
 export function useHomepageStats() {
@@ -13,7 +13,7 @@ export function useHomepageStats() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchAllEscrowsPublic();
+      const data = await fetchAllEscrows();
       setEscrows(data);
     } catch (err: any) {
       setError(err.message || "Failed to fetch protocol data");

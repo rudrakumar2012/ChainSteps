@@ -88,47 +88,6 @@ export async function fetchEscrowsByAddress(address: string): Promise<Escrow[]> 
   );
 }
 
-// Public (no wallet) contract reader for homepage stats
-
-export function getPublicReadContract(): ethers.Contract {
-  const provider = getReadOnlyProvider();
-  return new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-}
-
-export async function fetchAllEscrowsPublic(): Promise<Escrow[]> {
-  const contract = getPublicReadContract();
-  let count = 0;
-  while (true) {
-    try {
-      const creator = await contract.escrowCreators(count);
-      if (creator === ethers.ZeroAddress) break;
-      count++;
-    } catch {
-      break;
-    }
-  }
-  const promises = Array.from({ length: count }, (_, i) => {
-    return (async () => {
-      const [getEscrowData, escrowData] = await Promise.all([
-        contract.getEscrow(i),
-        contract.escrows(i),
-      ]);
-      return {
-        id: String(i),
-        client: getEscrowData.client as string,
-        freelancer: getEscrowData.freelancer as string,
-        state: Number(getEscrowData.state) as EscrowState,
-        currentMilestone: Number(getEscrowData.currentMilestone),
-        milestoneCount: Number(getEscrowData.milestoneCount),
-        totalAmount: ethers.formatEther(getEscrowData.totalAmount),
-        arbitrator: escrowData.arbitrator as string,
-        disputeTimeout: escrowData.disputeTimeout.toString(),
-      };
-    })();
-  });
-  return Promise.all(promises);
-}
-
 // Write operations — each sends a transaction via MetaMask
 // Returns TxHandle with hash exposed immediately; caller decides when to await confirmation
 
