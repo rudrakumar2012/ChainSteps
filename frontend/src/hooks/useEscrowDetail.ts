@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchEscrowFull, fetchAllMilestones } from "@/lib/contract";
+import { fetchEscrow, fetchAllMilestones } from "@/lib/contract";
 import type { Escrow, Milestone } from "@/types";
 
 interface UseEscrowDetailResult {
@@ -29,7 +29,7 @@ export function useEscrowDetail(id: string | null): UseEscrowDetailResult {
     setLoading(true);
     setError(null);
     try {
-      const escrowData = await fetchEscrowFull(Number(id));
+      const escrowData = await fetchEscrow(Number(id));
       setEscrow(escrowData);
 
       if (escrowData.milestoneCount > 0) {

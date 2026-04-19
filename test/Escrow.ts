@@ -32,13 +32,21 @@ describe("DecentralizedMilestoneEscrow", function () {
 
     it("should set correct escrow details", async function () {
       await escrow.createEscrow(freelancer.address, arbitrator.address);
-      const [escrowClient, escrowFreelancer, state, currentMilestone, milestoneCount, totalAmount] = await escrow.getEscrow(0);
+      const [escrowClient, escrowFreelancer, state, currentMilestone, milestoneCount, totalAmount, escrowArbitrator, disputeTimeout] = await escrow.getEscrow(0);
       expect(escrowClient).to.equal(client.address);
       expect(escrowFreelancer).to.equal(freelancer.address);
       expect(state).to.equal(0); // Created
       expect(currentMilestone).to.equal(0);
       expect(milestoneCount).to.equal(0);
       expect(totalAmount).to.equal(0);
+      expect(escrowArbitrator).to.equal(arbitrator.address);
+      expect(disputeTimeout).to.equal(7 * 24 * 60 * 60); // 7 days
+    });
+
+    it("should reject client == freelancer", async function () {
+      await expect(
+        escrow.createEscrow(client.address, arbitrator.address)
+      ).to.be.revertedWith("Client cannot be freelancer");
     });
   });
 
@@ -83,6 +91,21 @@ describe("DecentralizedMilestoneEscrow", function () {
         escrow.connect(client).addMilestone(0, "Late addition", ethers.parseEther("0.1"))
       ).to.be.revertedWith("Invalid state");
     });
+
+    it("should reject zero-amount milestones", async function () {
+      await expect(
+        escrow.addMilestone(0, "Free milestone", 0)
+      ).to.be.revertedWith("Milestone amount must be > 0");
+    });
+
+    it("should reject milestones beyond max count", async function () {
+      for (let i = 0; i < 50; i++) {
+        await escrow.addMilestone(0, `Milestone ${i}`, ethers.parseEther("0.01"));
+      }
+      await expect(
+        escrow.addMilestone(0, "Overflow", ethers.parseEther("0.01"))
+      ).to.be.revertedWith("Max milestones reached");
+    });
   });
 
   describe("Escrow Funding", function () {
@@ -98,11 +121,15 @@ describe("DecentralizedMilestoneEscrow", function () {
       expect(totalAmount).to.equal(ethers.parseEther("0.1"));
     });
 
-    it("should fund with excess amount", async function () {
-      await escrow.fundEscrow(0, { value: ethers.parseEther("0.2") });
-      const [, , state, , , totalAmount] = await escrow.getEscrow(0);
-      expect(state).to.equal(1);
-      expect(totalAmount).to.equal(ethers.parseEther("0.1"));
+    it("should refund excess ETH", async function () {
+      const balanceBefore = await ethers.provider.getBalance(client.address);
+      const tx = await escrow.fundEscrow(0, { value: ethers.parseEther("0.2") });
+      const receipt = await tx.wait();
+      const gasUsed = receipt.gasUsed * receipt.gasPrice;
+      const balanceAfter = await ethers.provider.getBalance(client.address);
+      // Client should only pay 0.1 ETH + gas, not 0.2 ETH
+      const expectedSpent = ethers.parseEther("0.1") + gasUsed;
+      expect(balanceBefore - balanceAfter).to.equal(expectedSpent);
     });
 
     it("should reject funding with insufficient amount", async function () {
@@ -243,16 +270,22 @@ describe("DecentralizedMilestoneEscrow", function () {
       await escrow.connect(freelancer).completeMilestone(0);
     });
 
-    it("should raise dispute", async function () {
+    it("should raise dispute by freelancer", async function () {
       await escrow.connect(freelancer).raiseDispute(0);
       const [, , state] = await escrow.getEscrow(0);
       expect(state).to.equal(2); // Disputed
     });
 
-    it("should reject raiseDispute from client", async function () {
+    it("should raise dispute by client", async function () {
+      await escrow.connect(client).raiseDispute(0);
+      const [, , state] = await escrow.getEscrow(0);
+      expect(state).to.equal(2); // Disputed
+    });
+
+    it("should reject raiseDispute from stranger", async function () {
       await expect(
-        escrow.connect(client).raiseDispute(0)
-      ).to.be.revertedWith("Only freelancer can call");
+        escrow.connect(stranger).raiseDispute(0)
+      ).to.be.revertedWith("Only client or freelancer");
     });
 
     it("should reject raiseDispute before completion", async function () {
@@ -268,9 +301,14 @@ describe("DecentralizedMilestoneEscrow", function () {
     it("should resolve dispute with split", async function () {
       await escrow.connect(freelancer).raiseDispute(0);
       const clientBalanceBefore = await ethers.provider.getBalance(client.address);
-      await escrow.connect(arbitrator).resolveDispute(0, 30);
+      const tx = await escrow.connect(arbitrator).resolveDispute(0, 30);
+      const receipt = await tx.wait();
       const clientBalanceAfter = await ethers.provider.getBalance(client.address);
       expect(clientBalanceAfter - clientBalanceBefore).to.equal(ethers.parseEther("0.03")); // 30% to client
+
+      // Should emit DisputeResolved event
+      const resolvedEvent = receipt.logs.find((log: any) => log.fragment?.name === "DisputeResolved");
+      expect(resolvedEvent).to.not.be.undefined;
     });
 
     it("should reject resolveDispute from non-arbitrator", async function () {
@@ -328,6 +366,15 @@ describe("DecentralizedMilestoneEscrow", function () {
       await escrow.connect(client).cancelEscrow(0);
       const [, , state] = await escrow.getEscrow(0);
       expect(state).to.equal(4); // Cancelled
+    });
+
+    it("should clear escrowCreators on cancellation", async function () {
+      await escrow.createEscrow(freelancer.address, arbitrator.address);
+      const creatorBefore = await escrow.escrowCreators(0);
+      expect(creatorBefore).to.equal(client.address);
+      await escrow.connect(client).cancelEscrow(0);
+      const creatorAfter = await escrow.escrowCreators(0);
+      expect(creatorAfter).to.equal(ethers.ZeroAddress);
     });
 
     it("should reject cancelEscrow after funding", async function () {
@@ -406,7 +453,7 @@ describe("DecentralizedMilestoneEscrow", function () {
       await escrow.connect(freelancer).completeMilestone(0);
       await expect(
         escrow.connect(stranger).raiseDispute(0)
-      ).to.be.revertedWith("Only freelancer can call");
+      ).to.be.revertedWith("Only client or freelancer");
     });
   });
 
@@ -445,6 +492,18 @@ describe("DecentralizedMilestoneEscrow", function () {
       await escrow.connect(arbitrator).resolveDispute(0, 50);
       const [, , state] = await escrow.getEscrow(0);
       expect(state).to.equal(1); // Active
+    });
+  });
+
+  describe("getApprovalTimeout edge cases", function () {
+    it("should return 0 when all milestones are complete", async function () {
+      await escrow.createEscrow(freelancer.address, arbitrator.address);
+      await escrow.addMilestone(0, "Design", ethers.parseEther("0.1"));
+      await escrow.fundEscrow(0, { value: ethers.parseEther("0.1") });
+      await escrow.connect(freelancer).completeMilestone(0);
+      await escrow.connect(client).approveMilestone(0);
+      const timeout = await escrow.getApprovalTimeout(0);
+      expect(timeout).to.equal(0);
     });
   });
 });

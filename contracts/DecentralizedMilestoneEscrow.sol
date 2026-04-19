@@ -29,6 +29,7 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
     }
 
     uint256 public constant DISPUTE_TIMEOUT = 7 days;
+    uint256 public constant MAX_MILESTONES = 50;
 
     Escrow[] public escrows;
     mapping(uint256 => address) public escrowCreators;
@@ -41,6 +42,7 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
     event MilestoneApproved(uint256 indexed escrowId, uint256 milestoneId);
     event MilestoneDisputed(uint256 indexed escrowId, uint256 milestoneId);
     event MilestoneClaimed(uint256 indexed escrowId, uint256 milestoneId);
+    event DisputeResolved(uint256 indexed escrowId, uint256 clientPercent, uint256 clientShare, uint256 freelancerShare);
     event FundsWithdrawn(uint256 indexed escrowId, uint256 amount);
 
     modifier onlyClient(uint256 _escrowId) {
@@ -60,11 +62,14 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
 
     /// @notice Create a new escrow
     function createEscrow(address _freelancer, address _arbitrator) external returns (uint256) {
+        require(_freelancer != msg.sender, "Client cannot be freelancer");
+
         Escrow storage escrow = escrows.push();
         escrow.client = msg.sender;
         escrow.freelancer = _freelancer;
         escrow.state = State.Created;
         escrow.arbitrator = _arbitrator != address(0) ? _arbitrator : msg.sender;
+        escrow.disputeTimeout = DISPUTE_TIMEOUT;
 
         uint256 escrowId = escrows.length - 1;
         escrowCreators[escrowId] = msg.sender;
@@ -75,8 +80,18 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
 
     /// @notice Cancel escrow before funding (only client, only before milestones funded)
     function cancelEscrow(uint256 _escrowId) external onlyClient(_escrowId) inState(_escrowId, State.Created) {
-        delete escrows[_escrowId];
-        escrows[_escrowId].state = State.Cancelled;
+        Escrow storage escrow = escrows[_escrowId];
+        // Reset fields individually — `delete` on struct with dynamic array corrupts storage
+        escrow.client = address(0);
+        escrow.freelancer = address(0);
+        escrow.state = State.Cancelled;
+        escrow.currentMilestone = 0;
+        escrow.disputeTimeout = 0;
+        escrow.arbitrator = address(0);
+        escrow.totalAmount = 0;
+        delete escrow.milestones;
+
+        escrowCreators[_escrowId] = address(0);
         emit EscrowCancelled(_escrowId);
     }
 
@@ -86,7 +101,9 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         string calldata _description,
         uint256 _amount
     ) external onlyClient(_escrowId) inState(_escrowId, State.Created) {
+        require(_amount > 0, "Milestone amount must be > 0");
         Escrow storage escrow = escrows[_escrowId];
+        require(escrow.milestones.length < MAX_MILESTONES, "Max milestones reached");
         escrow.milestones.push(Milestone({
             description: _description,
             amount: _amount,
@@ -111,6 +128,12 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         escrow.totalAmount = total;
         escrow.state = State.Active;
         emit MilestoneFunded(_escrowId, total);
+
+        // Refund excess ETH
+        if (msg.value > total) {
+            (bool sent, ) = payable(msg.sender).call{value: msg.value - total}("");
+            require(sent, "Refund failed");
+        }
     }
 
     /// @notice Mark current milestone as complete by freelancer
@@ -137,7 +160,8 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         milestone.isApproved = true;
         escrow.currentMilestone++;
 
-        payable(escrow.freelancer).transfer(milestone.amount);
+        (bool sent, ) = payable(escrow.freelancer).call{value: milestone.amount}("");
+        require(sent, "Transfer failed");
         emit MilestoneApproved(_escrowId, escrow.currentMilestone - 1);
         emit FundsWithdrawn(_escrowId, milestone.amount);
 
@@ -158,7 +182,8 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         milestone.isApproved = true;
         escrow.currentMilestone++;
 
-        payable(escrow.freelancer).transfer(milestone.amount);
+        (bool sent, ) = payable(escrow.freelancer).call{value: milestone.amount}("");
+        require(sent, "Transfer failed");
         emit MilestoneClaimed(_escrowId, escrow.currentMilestone - 1);
         emit FundsWithdrawn(_escrowId, milestone.amount);
 
@@ -167,9 +192,13 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         }
     }
 
-    /// @notice Raise a dispute
-    function raiseDispute(uint256 _escrowId) external onlyFreelancer(_escrowId) inState(_escrowId, State.Active) {
+    /// @notice Raise a dispute (client or freelancer)
+    function raiseDispute(uint256 _escrowId) external inState(_escrowId, State.Active) {
         Escrow storage escrow = escrows[_escrowId];
+        require(
+            msg.sender == escrow.client || msg.sender == escrow.freelancer,
+            "Only client or freelancer"
+        );
         require(escrow.currentMilestone < escrow.milestones.length, "No more milestones");
         require(escrow.milestones[escrow.currentMilestone].isCompleted, "Not completed");
         escrow.state = State.Disputed;
@@ -191,10 +220,15 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         escrow.state = State.Active;
 
         if (clientShare > 0) {
-            payable(escrow.client).transfer(clientShare);
+            (bool sentClient, ) = payable(escrow.client).call{value: clientShare}("");
+            require(sentClient, "Client transfer failed");
         }
-        payable(escrow.freelancer).transfer(freelancerShare);
+        if (freelancerShare > 0) {
+            (bool sentFreelancer, ) = payable(escrow.freelancer).call{value: freelancerShare}("");
+            require(sentFreelancer, "Freelancer transfer failed");
+        }
 
+        emit DisputeResolved(_escrowId, _clientPercent, clientShare, freelancerShare);
         emit FundsWithdrawn(_escrowId, clientShare);
         emit FundsWithdrawn(_escrowId, freelancerShare);
 
@@ -210,7 +244,9 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         State state,
         uint256 currentMilestone,
         uint256 milestoneCount,
-        uint256 totalAmount
+        uint256 totalAmount,
+        address arbitrator,
+        uint256 disputeTimeout
     ) {
         Escrow storage escrow = escrows[_escrowId];
         return (
@@ -219,7 +255,9 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
             escrow.state,
             escrow.currentMilestone,
             escrow.milestones.length,
-            escrow.totalAmount
+            escrow.totalAmount,
+            escrow.arbitrator,
+            escrow.disputeTimeout
         );
     }
 
@@ -247,6 +285,9 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
     /// @notice Get remaining time before auto-approval
     function getApprovalTimeout(uint256 _escrowId) external view returns (uint256) {
         Escrow storage escrow = escrows[_escrowId];
+        if (escrow.currentMilestone >= escrow.milestones.length) {
+            return 0;
+        }
         Milestone storage milestone = escrow.milestones[escrow.currentMilestone];
         if (milestone.approvalTimeout > block.timestamp) {
             return milestone.approvalTimeout - block.timestamp;

@@ -19,25 +19,18 @@ export async function getWriteContract(): Promise<ethers.Contract> {
 }
 
 export async function fetchEscrow(id: number): Promise<Escrow> {
-  return fetchEscrowFull(id);
-}
-
-export async function fetchEscrowFull(id: number): Promise<Escrow> {
   const contract = getReadContract();
-  const [getEscrowData, escrowData] = await Promise.all([
-    contract.getEscrow(id),
-    contract.escrows(id),
-  ]);
+  const data = await contract.getEscrow(id);
   return {
     id: String(id),
-    client: getEscrowData.client as string,
-    freelancer: getEscrowData.freelancer as string,
-    state: Number(getEscrowData.state) as EscrowState,
-    currentMilestone: Number(getEscrowData.currentMilestone),
-    milestoneCount: Number(getEscrowData.milestoneCount),
-    totalAmount: ethers.formatEther(getEscrowData.totalAmount),
-    arbitrator: escrowData.arbitrator as string,
-    disputeTimeout: escrowData.disputeTimeout.toString(),
+    client: data.client as string,
+    freelancer: data.freelancer as string,
+    state: Number(data.state) as EscrowState,
+    currentMilestone: Number(data.currentMilestone),
+    milestoneCount: Number(data.milestoneCount),
+    totalAmount: ethers.formatEther(data.totalAmount),
+    arbitrator: data.arbitrator as string,
+    disputeTimeout: data.disputeTimeout.toString(),
   };
 }
 
@@ -76,7 +69,7 @@ export async function fetchEscrowCount(): Promise<number> {
 
 export async function fetchAllEscrows(): Promise<Escrow[]> {
   const count = await fetchEscrowCount();
-  const promises = Array.from({ length: count }, (_, i) => fetchEscrowFull(i));
+  const promises = Array.from({ length: count }, (_, i) => fetchEscrow(i));
   return Promise.all(promises);
 }
 
@@ -84,7 +77,10 @@ export async function fetchEscrowsByAddress(address: string): Promise<Escrow[]> 
   const all = await fetchAllEscrows();
   const lower = address.toLowerCase();
   return all.filter(
-    (e) => e.client.toLowerCase() === lower || e.freelancer.toLowerCase() === lower
+    (e) =>
+      e.client.toLowerCase() === lower ||
+      e.freelancer.toLowerCase() === lower ||
+      (e.arbitrator && e.arbitrator.toLowerCase() === lower)
   );
 }
 
