@@ -5,14 +5,14 @@ import { getEscrowStatus, truncateAddress, escrowProgress } from "@/lib/utils";
 
 interface ContractRowProps {
   escrow: Escrow;
-  currentRole?: "client" | "freelancer" | null;
+  currentRole?: "client" | "freelancer" | "arbitrator" | null;
   onClick?: () => void;
 }
 
 function getRoleBadge(role: "client" | "freelancer" | "arbitrator") {
-  return role === "client"
-    ? { label: "Client", className: "bg-primary/10 text-primary border-primary/20" }
-    : { label: "Freelancer", className: "bg-secondary/10 text-secondary border-secondary/20" };
+  if (role === "client") return { label: "Client", className: "bg-primary/10 text-primary border-primary/20" };
+  if (role === "freelancer") return { label: "Freelancer", className: "bg-secondary/10 text-secondary border-secondary/20" };
+  return { label: "Arbitrator", className: "bg-tertiary/10 text-tertiary border-tertiary/20" };
 }
 
 export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) {
@@ -23,7 +23,10 @@ export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) 
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick?.(); } }}
       className="glass-card p-5 hover:scale-[1.01] cursor-pointer transition-all duration-200"
     >
       <div className="flex items-start justify-between gap-4 mb-4">

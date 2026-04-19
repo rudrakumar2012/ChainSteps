@@ -36,6 +36,7 @@ function orbitPath(radius: number, startAngle: number) {
 export function BlockchainCube() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   const tiltX = useMotionValue(0);
   const tiltY = useMotionValue(0);
@@ -66,10 +67,23 @@ export function BlockchainCube() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isMobile, tiltX, tiltY]);
 
+  // Reset tilt when mouse leaves
+  useEffect(() => {
+    if (!isHovering && !isMobile) {
+      tiltX.set(0);
+      tiltY.set(0);
+    }
+  }, [isHovering, isMobile, tiltX, tiltY]);
+
   const cubeSize = isMobile ? 40 : 60;
 
   return (
-    <div ref={containerRef} className="relative w-full h-full flex items-center justify-center">
+    <div
+      ref={containerRef}
+      className="relative w-full h-full flex items-center justify-center"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       {/* SVG connection lines */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
@@ -129,7 +143,7 @@ export function BlockchainCube() {
             rotateX: springX,
             rotateY: springY,
           }}
-          animate={{ rotateY: [0, 360] }}
+          animate={!isHovering ? { rotateY: [0, 360] } : undefined}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         >
           {FACES.map((face, i) => (

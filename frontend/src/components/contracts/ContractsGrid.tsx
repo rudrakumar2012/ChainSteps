@@ -39,6 +39,8 @@ export function ContractsGrid({
                 ? "client"
                 : escrow.freelancer.toLowerCase() === currentAddress.toLowerCase()
                 ? "freelancer"
+                : escrow.arbitrator?.toLowerCase() === currentAddress.toLowerCase()
+                ? "arbitrator"
                 : null
               : null
           }

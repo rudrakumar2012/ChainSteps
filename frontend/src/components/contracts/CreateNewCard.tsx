@@ -5,7 +5,10 @@ interface CreateNewCardProps {
 export function CreateNewCard({ onClick }: CreateNewCardProps) {
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
       className="
         glass-card p-6 cursor-pointer
         border-2 border-dashed border-white/10

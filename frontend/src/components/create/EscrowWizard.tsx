@@ -45,7 +45,12 @@ export function EscrowWizard({ clientAddress, onSubmit, onCancel }: EscrowWizard
 
   const updateFormData = useCallback((data: Partial<CreateEscrowFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
-    setErrors({});
+    const keys = Object.keys(data) as string[];
+    setErrors((prev) => {
+      const next = { ...prev };
+      for (const key of keys) delete next[key];
+      return next;
+    });
   }, []);
 
   const validateStep = (step: Step): boolean => {
@@ -56,6 +61,8 @@ export function EscrowWizard({ clientAddress, onSubmit, onCancel }: EscrowWizard
         newErrors.freelancer = "Freelancer address is required";
       } else if (!isValidAddress(formData.freelancer)) {
         newErrors.freelancer = "Invalid Ethereum address format";
+      } else if (formData.freelancer.toLowerCase() === clientAddress.toLowerCase()) {
+        newErrors.freelancer = "Freelancer cannot be the same as your (client) address";
       }
       if (formData.arbitrator && !isValidAddress(formData.arbitrator)) {
         newErrors.arbitrator = "Invalid Ethereum address format";

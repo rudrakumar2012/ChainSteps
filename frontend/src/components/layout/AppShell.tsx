@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 
@@ -27,6 +27,11 @@ export function AppShell({ children }: AppShellProps) {
 
   const toggle = () => setMobileOpen((prev) => !prev);
   const close = () => setMobileOpen(false);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <MobileNavContext.Provider value={{ isOpen: mobileOpen, toggle, close }}>

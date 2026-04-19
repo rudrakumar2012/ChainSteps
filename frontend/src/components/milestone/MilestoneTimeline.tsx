@@ -135,6 +135,23 @@ export function MilestoneTimeline({
                       }
                     `}
                   >
+                    {state === "completed" && "check_circle"}
+                    {state === "in_review" && "hourglass_top"}
+                    {state === "funded" && "lock"}
+                    {state === "unfunded" && "radio_button_unchecked"}
+                  </span>
+                  <span
+                    className={`
+                      text-xs font-bold
+                      ${
+                        state === "completed"
+                          ? "text-secondary"
+                          : state === "in_review"
+                          ? "text-tertiary"
+                          : "text-on-surface-variant"
+                      }
+                    `}
+                  >
                     {state === "completed" && "Verified"}
                     {state === "in_review" && "In Review - Awaiting Approval"}
                     {state === "funded" && "Funded - Awaiting Work"}

@@ -27,17 +27,32 @@ export function EvidencePanel({
 }: EvidencePanelProps) {
   const [showUpload, setShowUpload] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [sizeError, setSizeError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+  const filterFiles = (files: File[]): File[] => {
+    const oversized = files.filter((f) => f.size > MAX_FILE_SIZE);
+    if (oversized.length > 0) {
+      setSizeError(`${oversized.length} file(s) exceed the 10MB limit and were not added`);
+      return files.filter((f) => f.size <= MAX_FILE_SIZE);
+    }
+    setSizeError(null);
+    return files;
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setSelectedFiles((prev) => [...prev, ...files]);
+    const valid = filterFiles(files);
+    setSelectedFiles((prev) => [...prev, ...valid]);
   };
 
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
+    const valid = filterFiles(files);
+    setSelectedFiles((prev) => [...prev, ...valid]);
   };
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -107,6 +122,9 @@ export function EvidencePanel({
           </div>
 
           {/* Selected Files */}
+          {sizeError && (
+            <p className="text-xs text-error mb-2">{sizeError}</p>
+          )}
           {selectedFiles.length > 0 && (
             <div className="mt-4 space-y-2">
               {selectedFiles.map((file, index) => (

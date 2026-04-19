@@ -8,6 +8,7 @@ import { MilestonesStep } from "@/components/create/MilestonesStep";
 import { ReviewStep } from "@/components/create/ReviewStep";
 import { CreateEscrowFormData } from "@/types";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
+import { ConnectButton } from "@/components/wallet/ConnectButton";
 import { useTransactionContext } from "@/components/tx";
 import { createEscrowTx, addMilestoneTx, fundEscrowTx } from "@/lib/contract";
 import { isValidAddress } from "@/lib/utils";
@@ -42,7 +43,12 @@ export default function CreateEscrowPage() {
 
   const updateFormData = useCallback((data: Partial<CreateEscrowFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
-    setErrors({});
+    const keys = Object.keys(data) as string[];
+    setErrors((prev) => {
+      const next = { ...prev };
+      for (const key of keys) delete next[key];
+      return next;
+    });
   }, []);
 
   const validateStep = (step: Step): boolean => {
@@ -52,6 +58,8 @@ export default function CreateEscrowPage() {
         newErrors.freelancer = "Freelancer address is required";
       } else if (!isValidAddress(formData.freelancer)) {
         newErrors.freelancer = "Invalid Ethereum address format";
+      } else if (address && formData.freelancer.toLowerCase() === address.toLowerCase()) {
+        newErrors.freelancer = "Freelancer cannot be the same as your (client) address";
       }
       if (formData.arbitrator && !isValidAddress(formData.arbitrator)) {
         newErrors.arbitrator = "Invalid Ethereum address format";
@@ -145,6 +153,23 @@ export default function CreateEscrowPage() {
   );
 
   const clientAddress = address || "0x0000000000000000000000000000000000000000";
+
+  if (!isConnected) {
+    return (
+      <AppShell>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <div className="w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center mb-6">
+            <span className="material-symbols-outlined text-primary text-4xl">account_balance_wallet</span>
+          </div>
+          <h2 className="headline-font text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
+          <p className="text-on-surface-variant mb-6 max-w-md">
+            You need to connect a wallet to create an escrow contract. Your wallet address will be used as the client address.
+          </p>
+          <ConnectButton location="create-page" />
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
