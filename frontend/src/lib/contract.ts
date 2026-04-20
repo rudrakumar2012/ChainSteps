@@ -1,19 +1,18 @@
 import { ethers } from "ethers";
 import { getProvider, getReadOnlyProvider } from "./provider";
 import ABI from "./abi.json";
+import type { EIP1193Provider } from "./eip6963";
 import type { Escrow, Milestone, EscrowState } from "@/types";
 
 export const CONTRACT_ADDRESS = "0xb6906A1BCc6A942AaccA6B7Ba80A16F83C946d0E";
 
 export function getReadContract(): ethers.Contract {
-  const provider = typeof window !== "undefined" && window.ethereum
-    ? getProvider()
-    : getReadOnlyProvider();
+  const provider = getReadOnlyProvider();
   return new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
 }
 
-export async function getWriteContract(): Promise<ethers.Contract> {
-  const provider = getProvider();
+export async function getWriteContract(eip1193Provider: EIP1193Provider): Promise<ethers.Contract> {
+  const provider = getProvider(eip1193Provider);
   const signer = await provider.getSigner();
   return new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 }
@@ -95,65 +94,65 @@ export interface TxHandle {
   wait: () => Promise<ethers.TransactionReceipt | null>;
 }
 
-export async function createEscrowTx(freelancer: string, arbitrator: string): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function createEscrowTx(freelancer: string, arbitrator: string, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const tx = await contract.createEscrow(freelancer, arbitrator);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function addMilestoneTx(escrowId: number, description: string, amount: string): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function addMilestoneTx(escrowId: number, description: string, amount: string, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const value = ethers.parseEther(amount);
   const tx = await contract.addMilestone(escrowId, description, value);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function fundEscrowTx(escrowId: number, amount: string): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function fundEscrowTx(escrowId: number, amount: string, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const value = ethers.parseEther(amount);
   const tx = await contract.fundEscrow(escrowId, { value });
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function completeMilestoneTx(escrowId: number): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function completeMilestoneTx(escrowId: number, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const tx = await contract.completeMilestone(escrowId);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function approveMilestoneTx(escrowId: number): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function approveMilestoneTx(escrowId: number, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const tx = await contract.approveMilestone(escrowId);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function raiseDisputeTx(escrowId: number): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function raiseDisputeTx(escrowId: number, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const bondAmount = await contract.DISPUTE_BOND();
   const tx = await contract.raiseDispute(escrowId, { value: bondAmount });
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function resolveDisputeTx(escrowId: number, clientPercent: number): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function resolveDisputeTx(escrowId: number, clientPercent: number, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const tx = await contract.resolveDispute(escrowId, clientPercent);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function expireDisputeTx(escrowId: number): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function expireDisputeTx(escrowId: number, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const tx = await contract.expireDispute(escrowId);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function claimMilestoneTx(escrowId: number): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function claimMilestoneTx(escrowId: number, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const tx = await contract.claimMilestone(escrowId);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
-export async function cancelEscrowTx(escrowId: number): Promise<TxHandle> {
-  const contract = await getWriteContract();
+export async function cancelEscrowTx(escrowId: number, eip1193Provider: EIP1193Provider): Promise<TxHandle> {
+  const contract = await getWriteContract(eip1193Provider);
   const tx = await contract.cancelEscrow(escrowId);
   return { hash: tx.hash, wait: () => tx.wait() };
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useWalletContext } from "./WalletProvider";
+import { WalletChooserModal } from "./WalletChooserModal";
 import { Button } from "../ui/Button";
 import { truncateAddress } from "@/lib/utils";
 
@@ -23,7 +24,9 @@ export function ConnectButton({
     error,
   } = useWalletContext();
 
+  const [showChooser, setShowChooser] = useState(false);
   const prevConnectedRef = useRef(isConnected);
+
   useEffect(() => {
     if (isConnected && !prevConnectedRef.current) {
       onConnected?.();
@@ -44,13 +47,16 @@ export function ConnectButton({
 
   if (!isConnected) {
     return (
-      <div className="flex flex-col items-end gap-2">
-        {error && <div className="text-xs text-error max-w-[200px] text-right">{error}</div>}
-        <Button variant="primary" size="md" onClick={connect}>
-          <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
-          {error ? "Retry Connection" : "Connect Wallet"}
-        </Button>
-      </div>
+      <>
+        <div className="flex flex-col items-end gap-2">
+          {error && <div className="text-xs text-error max-w-[200px] text-right">{error}</div>}
+          <Button variant="primary" size="md" onClick={() => setShowChooser(true)}>
+            <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
+            {error ? "Retry Connection" : "Connect Wallet"}
+          </Button>
+        </div>
+        <WalletChooserModal open={showChooser} onClose={() => setShowChooser(false)} />
+      </>
     );
   }
 

@@ -65,7 +65,7 @@ function getStatusIcon(status: DisputeStatus) {
 
 export default function DisputesPage() {
   const router = useRouter();
-  const { address, isConnected } = useWalletContext();
+  const { address, isConnected, selectedProvider } = useWalletContext();
   const { trackTx } = useTransactionContext();
   const { data: escrows, loading, error, refetch } = useEscrows(isConnected ? address : undefined);
   const [activeFilter, setActiveFilter] = useState<"all" | DisputeStatus>("all");
@@ -86,7 +86,7 @@ export default function DisputesPage() {
     setResolveErrors((prev) => ({ ...prev, [escrowId]: null }));
     try {
       const pct = getClientPercent(escrowId);
-      const handle = await trackTx("Resolve Dispute", () => resolveDisputeTx(Number(escrowId), pct));
+      const handle = await trackTx("Resolve Dispute", () => resolveDisputeTx(Number(escrowId), pct, selectedProvider!));
       await handle.wait();
       refetch();
     } catch (err: any) {
@@ -294,7 +294,7 @@ export default function DisputesPage() {
                                     setResolvingId(dispute.escrowId);
                                     setResolveErrors((prev) => ({ ...prev, [dispute.escrowId]: null }));
                                     try {
-                                      const handle = await trackTx("Expire Dispute", () => expireDisputeTx(Number(dispute.escrowId)));
+                                      const handle = await trackTx("Expire Dispute", () => expireDisputeTx(Number(dispute.escrowId), selectedProvider!));
                                       await handle.wait();
                                       refetch();
                                     } catch (err: any) {

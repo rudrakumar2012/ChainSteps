@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode } from "react";
 import { useWallet } from "@/hooks/useWallet";
+import type { EIP1193Provider, EIP6963ProviderDetail } from "@/lib/eip6963";
 
 interface WalletContextValue {
   address: string | null;
@@ -10,6 +11,10 @@ interface WalletContextValue {
   isConnecting: boolean;
   isWrongNetwork: boolean;
   error: string | null;
+  providers: EIP6963ProviderDetail[];
+  selectedProvider: EIP1193Provider | null;
+  selectedDetail: EIP6963ProviderDetail | null;
+  selectProvider: (rdns: string) => void;
   connect: () => Promise<void>;
   disconnect: () => void;
   switchToSepolia: () => Promise<void>;

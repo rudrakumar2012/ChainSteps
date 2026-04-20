@@ -12,6 +12,7 @@ import { ConnectButton } from "@/components/wallet/ConnectButton";
 import { useTransactionContext } from "@/components/tx";
 import { createEscrowTx, addMilestoneTx, fundEscrowTx } from "@/lib/contract";
 import { getProvider } from "@/lib/provider";
+import type { EIP1193Provider } from "@/lib/eip6963";
 import { isValidAddress } from "@/lib/utils";
 import { ethers } from "ethers";
 
@@ -33,7 +34,7 @@ const initialFormData: CreateEscrowFormData = {
 
 export default function CreateEscrowPage() {
   const router = useRouter();
-  const { address, isConnected } = useWalletContext();
+  const { address, isConnected, selectedProvider } = useWalletContext();
   const { trackTx } = useTransactionContext();
   const [currentStep, setCurrentStep] = useState<Step>("parties");
   const [formData, setFormData] = useState<CreateEscrowFormData>(initialFormData);
@@ -108,7 +109,7 @@ export default function CreateEscrowPage() {
 
       // Step 1: Create escrow
       setSubmitStep("Creating escrow...");
-      const createHandle = await trackTx("Create Escrow", () => createEscrowTx(formData.freelancer, arbitrator));
+      const createHandle = await trackTx("Create Escrow", () => createEscrowTx(formData.freelancer, arbitrator, selectedProvider!));
       const receipt = await createHandle.wait();
       if (!receipt) throw new Error("Transaction failed");
 
@@ -133,13 +134,13 @@ export default function CreateEscrowPage() {
         const m = formData.milestones[i];
         const label = `Add Milestone ${i + 1}/${formData.milestones.length}`;
         setSubmitStep(label + "...");
-        const handle = await trackTx(label, () => addMilestoneTx(escrowId!, m.description, m.amount));
+        const handle = await trackTx(label, () => addMilestoneTx(escrowId!, m.description, m.amount, selectedProvider!));
         await handle.wait();
       }
 
       // Step 3: Fund escrow
       setSubmitStep("Funding escrow...");
-      const fundHandle = await trackTx("Fund Escrow", () => fundEscrowTx(escrowId!, totalAmount));
+      const fundHandle = await trackTx("Fund Escrow", () => fundEscrowTx(escrowId!, totalAmount, selectedProvider!));
       await fundHandle.wait();
 
       router.push(`/contracts/${escrowId}`);
@@ -165,9 +166,10 @@ export default function CreateEscrowPage() {
 
   // Estimate network fee: (create + N addMilestone + fund) txs
   useEffect(() => {
+    if (!selectedProvider) return;
     (async () => {
       try {
-        const provider = getProvider();
+        const provider = getProvider(selectedProvider);
         const feeData = await provider.getFeeData();
         const gasPrice = feeData.gasPrice;
         if (!gasPrice) return;
@@ -180,7 +182,7 @@ export default function CreateEscrowPage() {
         // fallback keeps default
       }
     })();
-  }, [formData.milestones.length]);
+  }, [formData.milestones.length, selectedProvider]);
 
   if (!isConnected) {
     return (
