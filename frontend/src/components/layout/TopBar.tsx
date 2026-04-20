@@ -44,9 +44,6 @@ export function TopBar() {
               </span>
             )}
           </div>
-          <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">
-            settings
-          </span>
         </div>
         <ConnectButton location="dashboard" />
       </div>

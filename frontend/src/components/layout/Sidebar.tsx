@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useWalletContext } from "../wallet/WalletProvider";
 
 interface NavItem {
   label: string;
@@ -68,57 +67,26 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
         ))}
       </nav>
 
-      {/* Wallet info */}
-      <div className="px-6 pt-6 mt-auto">
-        <WalletConnection />
-      </div>
-    </aside>
-  );
-}
-
-function WalletConnection() {
-  const { address, isConnected, connect, disconnect } = useWalletContext();
-
-  if (isConnected && address) {
-    return (
-      <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container w-full border border-primary/20">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-xs font-bold text-on-primary shadow-lg shadow-primary/20 shrink-0">
-            {address.slice(2, 4).toUpperCase()}
+      {/* Network info */}
+      <div className="px-4 pt-6 mt-auto">
+        <div className="p-3 rounded-xl bg-surface-container border border-white/5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">Network</span>
+            <span className="text-[10px] text-secondary font-medium">Sepolia</span>
           </div>
-          <div className="overflow-hidden text-left">
-            <p className="text-xs font-bold text-white truncate">
-              {address.slice(0, 6)}...{address.slice(-4)}
-            </p>
-            <p className="text-[10px] text-secondary flex items-center gap-1 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_5px_#4edea3]"></span>
-              Connected
-            </p>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">Contract</span>
+            <span className="text-[10px] text-on-surface-variant font-mono">0xb690...0E</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">Chain</span>
+            <span className="text-[10px] text-on-surface-variant font-mono">11155111</span>
           </div>
         </div>
-        <button
-          onClick={disconnect}
-          className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors ml-2 shrink-0"
-          title="Disconnect Wallet"
-        >
-          <span className="material-symbols-outlined text-sm">logout</span>
-        </button>
+        <p className="text-[9px] text-on-surface-variant/50 text-center mt-3 mb-2">
+          v1.0.0 &middot; ChainSteps
+        </p>
       </div>
-    );
-  }
-
-  return (
-    <button 
-      onClick={connect}
-      className="flex items-center gap-3 p-3 rounded-xl bg-surface-container w-full hover:bg-surface-container-high hover:border-primary/30 transition-all border border-transparent group"
-    >
-      <div className="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-xs font-bold text-on-surface-variant border border-outline-variant/20 group-hover:text-primary transition-colors">
-        <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
-      </div>
-      <div className="overflow-hidden text-left">
-        <p className="text-xs font-bold text-on-surface truncate group-hover:text-white transition-colors">Not Connected</p>
-        <p className="text-[10px] text-primary">Connect Wallet</p>
-      </div>
-    </button>
+    </aside>
   );
 }
