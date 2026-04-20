@@ -7,8 +7,8 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrows } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
 import { useTransactionContext } from "@/components/tx";
-import { EscrowState, Dispute } from "@/types";
-import { resolveDisputeTx } from "@/lib/contract";
+import { EscrowState, Dispute, RESOLUTION_DELAY_SECONDS, MAX_DISPUTE_DURATION_SECONDS } from "@/types";
+import { resolveDisputeTx, expireDisputeTx } from "@/lib/contract";
 import { truncateAddress } from "@/lib/utils";
 
 type DisputeStatus = "under_review" | "resolved";
@@ -19,7 +19,7 @@ const filterOptions: { value: "all" | DisputeStatus; label: string }[] = [
   { value: "resolved", label: "Resolved" },
 ];
 
-function buildDisputes(escrows: { id: string; client: string; freelancer: string; state: EscrowState; currentMilestone: number; disputeTimeout: string; arbitrator: string }[]): (Dispute & { escrowState: EscrowState })[] {
+function buildDisputes(escrows: { id: string; client: string; freelancer: string; state: EscrowState; currentMilestone: number; disputeTimeout: string; arbitrator: string; disputeRaisedAt: string; disputeRaiser: string; disputeBond: string }[]): (Dispute & { escrowState: EscrowState })[] {
   return escrows
     .filter((e) => e.state === EscrowState.Disputed || e.state === EscrowState.Active || e.state === EscrowState.Completed)
     .filter((e) => e.state === EscrowState.Disputed || e.currentMilestone > 0)
@@ -32,6 +32,9 @@ function buildDisputes(escrows: { id: string; client: string; freelancer: string
       disputeTimeout: e.disputeTimeout,
       arbitrator: e.arbitrator,
       escrowState: e.state,
+      disputeRaisedAt: e.disputeRaisedAt,
+      disputeRaiser: e.disputeRaiser,
+      disputeBond: e.disputeBond,
     }));
 }
 
@@ -229,6 +232,12 @@ export default function DisputesPage() {
                             Arbitrator: {truncateAddress(dispute.arbitrator)}
                           </span>
                         )}
+                        {Number(dispute.disputeBond) > 0 && (
+                          <span className="flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">payments</span>
+                            Bond: {dispute.disputeBond} ETH
+                          </span>
+                        )}
                         <button
                           onClick={() => router.push(`/contracts/${dispute.escrowId}`)}
                           className="px-4 py-1.5 rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
@@ -238,40 +247,76 @@ export default function DisputesPage() {
                       </div>
 
                       {/* Resolve Dispute (arbitrator only) */}
-                      {address?.toLowerCase() === dispute.arbitrator.toLowerCase() && getDisputeStatus(dispute) === "under_review" && (
-                        <div className="mt-4 pt-4 bg-surface-container-low/30 -mx-4 sm:-mx-8 -mb-4 px-4 sm:px-8 pb-4 rounded-b-xl">
-                          <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">
-                            Resolve Dispute
-                          </p>
-                          <div className="flex items-center gap-4 mb-3">
-                            <label className="text-xs text-on-surface-variant">Client share:</label>
-                            <input
-                              type="range"
-                              min={0}
-                              max={100}
-                              value={getClientPercent(dispute.escrowId)}
-                              onChange={(e) => setClientPercents((prev) => ({ ...prev, [dispute.escrowId]: Number(e.target.value) }))}
-                              className="flex-1 accent-primary"
-                            />
-                            <span className="text-sm font-bold text-white headline-font w-12 text-right">{getClientPercent(dispute.escrowId)}%</span>
-                          </div>
-                          <button
-                            onClick={() => handleResolve(dispute.escrowId)}
-                            disabled={resolvingId === dispute.escrowId}
-                            className="bg-secondary text-on-secondary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
-                          >
-                            {resolvingId === dispute.escrowId ? (
-                              <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
-                            ) : (
-                              <span className="material-symbols-outlined text-[16px]">gavel</span>
+                      {address?.toLowerCase() === dispute.arbitrator.toLowerCase() && getDisputeStatus(dispute) === "under_review" && (() => {
+                        const raisedAt = Number(dispute.disputeRaisedAt);
+                        const canResolve = raisedAt > 0 && Date.now() / 1000 >= raisedAt + RESOLUTION_DELAY_SECONDS;
+                        const canExpire = raisedAt > 0 && Date.now() / 1000 >= raisedAt + MAX_DISPUTE_DURATION_SECONDS;
+                        const resolutionAvailableAt = raisedAt > 0 ? (raisedAt + RESOLUTION_DELAY_SECONDS) * 1000 : null;
+                        return (
+                          <div className="mt-4 pt-4 bg-surface-container-low/30 -mx-4 sm:-mx-8 -mb-4 px-4 sm:px-8 pb-4 rounded-b-xl">
+                            <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">
+                              Resolve Dispute
+                            </p>
+                            {!canResolve && resolutionAvailableAt && (
+                              <div className="flex items-center gap-2 mb-3 text-xs text-on-surface-variant">
+                                <span className="material-symbols-outlined text-[14px] text-primary">schedule</span>
+                                Evidence period active. Resolution available {new Date(resolutionAvailableAt).toLocaleString()}.
+                              </div>
                             )}
-                            {resolvingId === dispute.escrowId ? "Confirming..." : "Resolve"}
-                          </button>
-                          {resolveErrors[dispute.escrowId] && resolvingId === null && (
-                            <p className="text-xs text-error mt-2">{resolveErrors[dispute.escrowId]}</p>
-                          )}
-                        </div>
-                      )}
+                            <div className="flex items-center gap-4 mb-3">
+                              <label className="text-xs text-on-surface-variant">Client share:</label>
+                              <input
+                                type="range"
+                                min={0}
+                                max={100}
+                                value={getClientPercent(dispute.escrowId)}
+                                onChange={(e) => setClientPercents((prev) => ({ ...prev, [dispute.escrowId]: Number(e.target.value) }))}
+                                className="flex-1 accent-primary"
+                              />
+                              <span className="text-sm font-bold text-white headline-font w-12 text-right">{getClientPercent(dispute.escrowId)}%</span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                onClick={() => handleResolve(dispute.escrowId)}
+                                disabled={resolvingId === dispute.escrowId || !canResolve}
+                                className="bg-secondary text-on-secondary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                              >
+                                {resolvingId === dispute.escrowId ? (
+                                  <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                                ) : (
+                                  <span className="material-symbols-outlined text-[16px]">gavel</span>
+                                )}
+                                {resolvingId === dispute.escrowId ? "Confirming..." : canResolve ? "Resolve" : "Resolve (24h delay)"}
+                              </button>
+                              {canExpire && (
+                                <button
+                                  onClick={async () => {
+                                    setResolvingId(dispute.escrowId);
+                                    setResolveErrors((prev) => ({ ...prev, [dispute.escrowId]: null }));
+                                    try {
+                                      const handle = await trackTx("Expire Dispute", () => expireDisputeTx(Number(dispute.escrowId)));
+                                      await handle.wait();
+                                      refetch();
+                                    } catch (err: any) {
+                                      setResolveErrors((prev) => ({ ...prev, [dispute.escrowId]: err?.reason || err?.message || "Failed to expire dispute" }));
+                                    } finally {
+                                      setResolvingId(null);
+                                    }
+                                  }}
+                                  disabled={resolvingId === dispute.escrowId}
+                                  className="bg-error/80 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">timer_off</span>
+                                  Expire Dispute
+                                </button>
+                              )}
+                            </div>
+                            {resolveErrors[dispute.escrowId] && resolvingId === null && (
+                              <p className="text-xs text-error mt-2">{resolveErrors[dispute.escrowId]}</p>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 );

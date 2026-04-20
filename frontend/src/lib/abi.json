@@ -16,6 +16,31 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "milestoneId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "freelancerPayout",
+        "type": "uint256"
+      }
+    ],
+    "name": "DisputeExpired",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "escrowId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "clientPercent",
         "type": "uint256"
       },
@@ -220,6 +245,19 @@
   },
   {
     "inputs": [],
+    "name": "DISPUTE_BOND",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "DISPUTE_TIMEOUT",
     "outputs": [
       {
@@ -233,7 +271,33 @@
   },
   {
     "inputs": [],
+    "name": "MAX_DISPUTE_DURATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "MAX_MILESTONES",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RESOLUTION_DELAY",
     "outputs": [
       {
         "internalType": "uint256",
@@ -406,9 +470,37 @@
         "internalType": "uint256",
         "name": "totalAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "disputeRaisedAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "disputeRaiser",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "disputeBond",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_escrowId",
+        "type": "uint256"
+      }
+    ],
+    "name": "expireDispute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -492,6 +584,21 @@
         "internalType": "uint256",
         "name": "disputeTimeout",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "disputeRaisedAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "disputeRaiser",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "disputeBond",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -556,7 +663,7 @@
     ],
     "name": "raiseDispute",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {

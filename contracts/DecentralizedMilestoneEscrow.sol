@@ -26,10 +26,16 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         uint256 disputeTimeout;
         address arbitrator;
         uint256 totalAmount;
+        uint256 disputeRaisedAt;
+        address disputeRaiser;
+        uint256 disputeBond;
     }
 
     uint256 public constant DISPUTE_TIMEOUT = 7 days;
     uint256 public constant MAX_MILESTONES = 50;
+    uint256 public constant RESOLUTION_DELAY = 1 days;
+    uint256 public constant DISPUTE_BOND = 0.001 ether;
+    uint256 public constant MAX_DISPUTE_DURATION = 30 days;
 
     Escrow[] public escrows;
     mapping(uint256 => address) public escrowCreators;
@@ -43,6 +49,7 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
     event MilestoneDisputed(uint256 indexed escrowId, uint256 milestoneId);
     event MilestoneClaimed(uint256 indexed escrowId, uint256 milestoneId);
     event DisputeResolved(uint256 indexed escrowId, uint256 clientPercent, uint256 clientShare, uint256 freelancerShare);
+    event DisputeExpired(uint256 indexed escrowId, uint256 milestoneId, uint256 freelancerPayout);
     event FundsWithdrawn(uint256 indexed escrowId, uint256 amount);
 
     modifier onlyClient(uint256 _escrowId) {
@@ -63,12 +70,15 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
     /// @notice Create a new escrow
     function createEscrow(address _freelancer, address _arbitrator) external returns (uint256) {
         require(_freelancer != msg.sender, "Client cannot be freelancer");
+        require(_arbitrator != address(0), "Arbitrator is required");
+        require(_arbitrator != msg.sender, "Client cannot be arbitrator");
+        require(_arbitrator != _freelancer, "Freelancer cannot be arbitrator");
 
         Escrow storage escrow = escrows.push();
         escrow.client = msg.sender;
         escrow.freelancer = _freelancer;
         escrow.state = State.Created;
-        escrow.arbitrator = _arbitrator != address(0) ? _arbitrator : msg.sender;
+        escrow.arbitrator = _arbitrator;
         escrow.disputeTimeout = DISPUTE_TIMEOUT;
 
         uint256 escrowId = escrows.length - 1;
@@ -89,6 +99,9 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         escrow.disputeTimeout = 0;
         escrow.arbitrator = address(0);
         escrow.totalAmount = 0;
+        escrow.disputeRaisedAt = 0;
+        escrow.disputeRaiser = address(0);
+        escrow.disputeBond = 0;
         delete escrow.milestones;
 
         escrowCreators[_escrowId] = address(0);
@@ -192,8 +205,8 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         }
     }
 
-    /// @notice Raise a dispute (client or freelancer)
-    function raiseDispute(uint256 _escrowId) external inState(_escrowId, State.Active) {
+    /// @notice Raise a dispute (client or freelancer, requires bond)
+    function raiseDispute(uint256 _escrowId) external payable inState(_escrowId, State.Active) {
         Escrow storage escrow = escrows[_escrowId];
         require(
             msg.sender == escrow.client || msg.sender == escrow.freelancer,
@@ -201,15 +214,24 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         );
         require(escrow.currentMilestone < escrow.milestones.length, "No more milestones");
         require(escrow.milestones[escrow.currentMilestone].isCompleted, "Not completed");
+        require(msg.value >= DISPUTE_BOND, "Insufficient dispute bond");
+
         escrow.state = State.Disputed;
+        escrow.disputeRaisedAt = block.timestamp;
+        escrow.disputeRaiser = msg.sender;
+        escrow.disputeBond = msg.value;
         emit MilestoneDisputed(_escrowId, escrow.currentMilestone);
     }
 
-    /// @notice Resolve dispute and move funds
+    /// @notice Resolve dispute and move funds (arbitrator only, after 24h delay)
     function resolveDispute(uint256 _escrowId, uint256 _clientPercent) external inState(_escrowId, State.Disputed) nonReentrant {
         Escrow storage escrow = escrows[_escrowId];
         require(msg.sender == escrow.arbitrator, "Only arbitrator");
         require(_clientPercent <= 100, "Invalid percentage");
+        require(
+            block.timestamp >= escrow.disputeRaisedAt + RESOLUTION_DELAY,
+            "Resolution delay not elapsed"
+        );
 
         Milestone storage milestone = escrow.milestones[escrow.currentMilestone];
         uint256 clientShare = (milestone.amount * _clientPercent) / 100;
@@ -228,6 +250,13 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
             require(sentFreelancer, "Freelancer transfer failed");
         }
 
+        // Distribute bond: freelancer wins at clientPercent <= 50, client wins above 50
+        if (escrow.disputeBond > 0) {
+            address bondRecipient = _clientPercent > 50 ? escrow.client : escrow.freelancer;
+            (bool sentBond, ) = payable(bondRecipient).call{value: escrow.disputeBond}("");
+            require(sentBond, "Bond transfer failed");
+        }
+
         emit DisputeResolved(_escrowId, _clientPercent, clientShare, freelancerShare);
         emit FundsWithdrawn(_escrowId, clientShare);
         emit FundsWithdrawn(_escrowId, freelancerShare);
@@ -235,6 +264,42 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         if (escrow.currentMilestone >= escrow.milestones.length) {
             escrow.state = State.Completed;
         }
+
+        escrow.disputeRaisedAt = 0;
+        escrow.disputeRaiser = address(0);
+        escrow.disputeBond = 0;
+    }
+
+    /// @notice Expire a dispute after max duration, releasing funds to the freelancer
+    function expireDispute(uint256 _escrowId) external inState(_escrowId, State.Disputed) nonReentrant {
+        Escrow storage escrow = escrows[_escrowId];
+        require(
+            block.timestamp >= escrow.disputeRaisedAt + MAX_DISPUTE_DURATION,
+            "Dispute not expired"
+        );
+
+        Milestone storage milestone = escrow.milestones[escrow.currentMilestone];
+        require(!milestone.isApproved, "Already approved");
+
+        milestone.isApproved = true;
+        escrow.currentMilestone++;
+
+        (bool sentFreelancer, ) = payable(escrow.freelancer).call{value: milestone.amount}("");
+        require(sentFreelancer, "Freelancer transfer failed");
+
+        if (escrow.disputeBond > 0) {
+            (bool sentBond, ) = payable(escrow.freelancer).call{value: escrow.disputeBond}("");
+            require(sentBond, "Bond transfer failed");
+        }
+
+        escrow.state = escrow.currentMilestone >= escrow.milestones.length ? State.Completed : State.Active;
+
+        emit DisputeExpired(_escrowId, escrow.currentMilestone - 1, milestone.amount);
+        emit FundsWithdrawn(_escrowId, milestone.amount);
+
+        escrow.disputeRaisedAt = 0;
+        escrow.disputeRaiser = address(0);
+        escrow.disputeBond = 0;
     }
 
     /// @notice Get escrow details
@@ -246,7 +311,10 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
         uint256 milestoneCount,
         uint256 totalAmount,
         address arbitrator,
-        uint256 disputeTimeout
+        uint256 disputeTimeout,
+        uint256 disputeRaisedAt,
+        address disputeRaiser,
+        uint256 disputeBond
     ) {
         Escrow storage escrow = escrows[_escrowId];
         return (
@@ -257,7 +325,10 @@ contract DecentralizedMilestoneEscrow is ReentrancyGuard {
             escrow.milestones.length,
             escrow.totalAmount,
             escrow.arbitrator,
-            escrow.disputeTimeout
+            escrow.disputeTimeout,
+            escrow.disputeRaisedAt,
+            escrow.disputeRaiser,
+            escrow.disputeBond
         );
     }
 

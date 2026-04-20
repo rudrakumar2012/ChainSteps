@@ -52,7 +52,7 @@ export function ReviewStep({ formData, clientAddress }: ReviewStepProps) {
               Arbitrator
             </p>
             <p className="text-sm font-mono text-tertiary truncate">
-              {formData.arbitrator ? truncateAddress(formData.arbitrator) : "Protocol Default"}
+              {formData.arbitrator ? truncateAddress(formData.arbitrator) : "—"}
             </p>
           </div>
         </div>

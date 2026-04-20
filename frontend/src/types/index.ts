@@ -6,6 +6,10 @@ export enum EscrowState {
   Cancelled = 4,
 }
 
+export const RESOLUTION_DELAY_SECONDS = 86400;       // 1 day
+export const MAX_DISPUTE_DURATION_SECONDS = 2592000;  // 30 days
+export const DISPUTE_BOND_ETH = "0.001";
+
 export interface Escrow {
   id: string;
   client: string;
@@ -16,6 +20,9 @@ export interface Escrow {
   totalAmount: string;
   arbitrator: string;
   disputeTimeout: string;
+  disputeRaisedAt: string;
+  disputeRaiser: string;
+  disputeBond: string;
 }
 
 export interface Milestone {
@@ -50,7 +57,7 @@ export interface DashboardStats {
 
 export interface CreateEscrowFormData {
   freelancer: string;
-  arbitrator?: string;
+  arbitrator: string;
   milestones: MilestoneInput[];
 }
 
@@ -74,4 +81,7 @@ export interface Dispute {
   milestoneDescription: string;
   disputeTimeout: string;
   arbitrator: string;
+  disputeRaisedAt: string;
+  disputeRaiser: string;
+  disputeBond: string;
 }

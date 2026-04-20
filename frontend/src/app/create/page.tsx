@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout";
 import { PartiesStep } from "@/components/create/PartiesStep";
@@ -11,6 +11,7 @@ import { useWalletContext } from "@/components/wallet/WalletProvider";
 import { ConnectButton } from "@/components/wallet/ConnectButton";
 import { useTransactionContext } from "@/components/tx";
 import { createEscrowTx, addMilestoneTx, fundEscrowTx } from "@/lib/contract";
+import { getProvider } from "@/lib/provider";
 import { isValidAddress } from "@/lib/utils";
 import { ethers } from "ethers";
 
@@ -61,8 +62,14 @@ export default function CreateEscrowPage() {
       } else if (address && formData.freelancer.toLowerCase() === address.toLowerCase()) {
         newErrors.freelancer = "Freelancer cannot be the same as your (client) address";
       }
-      if (formData.arbitrator && !isValidAddress(formData.arbitrator)) {
+      if (!formData.arbitrator.trim()) {
+        newErrors.arbitrator = "Arbitrator address is required";
+      } else if (!isValidAddress(formData.arbitrator)) {
         newErrors.arbitrator = "Invalid Ethereum address format";
+      } else if (address && formData.arbitrator.toLowerCase() === address.toLowerCase()) {
+        newErrors.arbitrator = "Arbitrator cannot be the same as your (client) address";
+      } else if (formData.freelancer && formData.arbitrator.toLowerCase() === formData.freelancer.toLowerCase()) {
+        newErrors.arbitrator = "Arbitrator cannot be the same as the freelancer";
       }
     }
     if (step === "milestones") {
@@ -97,7 +104,7 @@ export default function CreateEscrowPage() {
     if (!validateStep(currentStep)) return;
     setIsSubmitting(true);
     try {
-      const arbitrator = formData.arbitrator || ethers.ZeroAddress;
+      const arbitrator = formData.arbitrator!;
 
       // Step 1: Create escrow
       setSubmitStep("Creating escrow...");
@@ -152,7 +159,28 @@ export default function CreateEscrowPage() {
     )
   );
 
+  const [estimatedFee, setEstimatedFee] = useState("~ 0.0003 ETH");
+
   const clientAddress = address || "0x0000000000000000000000000000000000000000";
+
+  // Estimate network fee: (create + N addMilestone + fund) txs
+  useEffect(() => {
+    (async () => {
+      try {
+        const provider = getProvider();
+        const feeData = await provider.getFeeData();
+        const gasPrice = feeData.gasPrice;
+        if (!gasPrice) return;
+        const txCount = 2 + formData.milestones.length; // create + milestones + fund
+        const gasPerTx = BigInt(150000);
+        const totalGas = gasPerTx * BigInt(txCount);
+        const totalCost = totalGas * gasPrice;
+        setEstimatedFee(`~ ${parseFloat(ethers.formatEther(totalCost)).toFixed(6)} ETH`);
+      } catch {
+        // fallback keeps default
+      }
+    })();
+  }, [formData.milestones.length]);
 
   if (!isConnected) {
     return (
@@ -373,7 +401,7 @@ export default function CreateEscrowPage() {
                   <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
                     Network Fee
                   </p>
-                  <p className="text-sm font-medium text-on-surface">~ 0.01 ETH</p>
+                  <p className="text-sm font-medium text-on-surface">{estimatedFee}</p>
                 </div>
               </div>
               <div className="mt-6 pt-6 bg-surface-container-low/30 -mx-8 -mb-8 px-8 pb-6 rounded-b-xl flex items-center space-x-4">

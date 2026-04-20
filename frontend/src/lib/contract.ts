@@ -31,6 +31,9 @@ export async function fetchEscrow(id: number): Promise<Escrow> {
     totalAmount: ethers.formatEther(data.totalAmount),
     arbitrator: data.arbitrator as string,
     disputeTimeout: data.disputeTimeout.toString(),
+    disputeRaisedAt: data.disputeRaisedAt.toString(),
+    disputeRaiser: data.disputeRaiser as string,
+    disputeBond: ethers.formatEther(data.disputeBond),
   };
 }
 
@@ -126,13 +129,20 @@ export async function approveMilestoneTx(escrowId: number): Promise<TxHandle> {
 
 export async function raiseDisputeTx(escrowId: number): Promise<TxHandle> {
   const contract = await getWriteContract();
-  const tx = await contract.raiseDispute(escrowId);
+  const bondAmount = await contract.DISPUTE_BOND();
+  const tx = await contract.raiseDispute(escrowId, { value: bondAmount });
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 
 export async function resolveDisputeTx(escrowId: number, clientPercent: number): Promise<TxHandle> {
   const contract = await getWriteContract();
   const tx = await contract.resolveDispute(escrowId, clientPercent);
+  return { hash: tx.hash, wait: () => tx.wait() };
+}
+
+export async function expireDisputeTx(escrowId: number): Promise<TxHandle> {
+  const contract = await getWriteContract();
+  const tx = await contract.expireDispute(escrowId);
   return { hash: tx.hash, wait: () => tx.wait() };
 }
 

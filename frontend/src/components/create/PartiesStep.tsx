@@ -53,13 +53,13 @@ export function PartiesStep({ formData, onUpdate, errors }: PartiesStepProps) {
         {/* Arbitrator Address (Optional) */}
         <div>
           <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
-            Arbitrator Address <span className="text-on-surface-variant/50">(Optional)</span>
+            Arbitrator Address <span className="text-error">*</span>
           </label>
           <input
             type="text"
             value={formData.arbitrator || ""}
             onChange={(e) => onUpdate({ arbitrator: e.target.value })}
-            placeholder="0x... (defaults to ChainSteps protocol)"
+            placeholder="0x... (independent third party)"
             className={`
               w-full bg-surface-container-low border rounded-lg px-4 py-3
               text-white placeholder:text-on-surface-variant/50
@@ -72,7 +72,7 @@ export function PartiesStep({ formData, onUpdate, errors }: PartiesStepProps) {
           )}
           {!formData.arbitrator && (
             <p className="text-xs text-on-surface-variant/70 mt-1">
-              Leave empty to use the protocol default arbitrator
+              Must be an independent third party — not the client or freelancer
             </p>
           )}
         </div>

@@ -9,16 +9,29 @@ https://github.com/rudrakumar2012/ChainSteps
 ## Key Files
 - `contracts/DecentralizedMilestoneEscrow.sol` - Main smart contract
 - `hardhat.config.cjs` - Hardhat configuration
-- `test/Escrow.ts` - Contract tests (52 tests)
+- `test/Escrow.ts` - Contract tests (70 tests)
 - `scripts/deploy.ts` - Deployment script (replaces CONTRACT_ADDRESS in .env.local)
 - `backend/` - Express.js API server
-- `EXPLANATION.md` - Project explanation (for submission/report)
 
 ## Tech Stack
 - Hardhat 2.22, Solidity 0.8.28, OpenZeppelin 5.6
 - Ethereum Sepolia testnet
 - Next.js (frontend), Node.js/Express (backend)
 - ethers.js v6 for Web3
+
+## Smart Contract Key Constants
+- `DISPUTE_TIMEOUT = 7 days` — auto-claim window after milestone completion
+- `RESOLUTION_DELAY = 1 days` — evidence period before arbitrator can resolve
+- `DISPUTE_BOND = 0.001 ether` — bond required to raise a dispute (awarded to winning party)
+- `MAX_DISPUTE_DURATION = 30 days` — after which anyone can expire the dispute (funds to freelancer)
+- `MAX_MILESTONES = 50`
+
+## Smart Contract Key Constraints
+- Arbitrator is **required** — cannot be client, freelancer, or zero address
+- `raiseDispute` is payable (requires bond)
+- `resolveDispute` has a 24-hour delay (evidence period)
+- `expireDispute` releases funds to freelancer after 30 days of arbitrator inaction
+- Bond goes to winning party: client if `clientPercent > 50`, freelancer otherwise
 
 ## Frontend Structure
 ```
@@ -33,11 +46,11 @@ frontend/
 │   │   ├── contracts/
 │   │   │   ├── page.tsx    # My Contracts / Ledger page
 │   │   │   └── [id]/
-│   │   │       └── page.tsx # Contract detail (milestone timeline, evidence)
+│   │   │       └── page.tsx # Contract detail (milestone timeline, dispute resolver)
 │   │   ├── create/
-│   │   │   └── page.tsx    # New escrow wizard (vertical stepper)
+│   │   │   └── page.tsx    # New escrow wizard (vertical stepper, dynamic network fee)
 │   │   └── disputes/
-│   │       └── page.tsx    # Dispute resolution page
+│   │       └── page.tsx    # Dispute resolution page (bond display, countdowns, expire)
 │   ├── components/
 │   │   ├── ui/             # GlassCard, Button, StatusBadge, ProgressBar
 │   │   ├── layout/         # Sidebar, TopBar, AppShell (with WalletProvider)
@@ -50,8 +63,8 @@ frontend/
 │   │   ├── tx/             # TransactionProvider, TransactionToast, ToastContainer
 │   │   └── wallet/         # WalletProvider, ConnectButton
 │   ├── hooks/              # useWallet, useEscrows, useEscrowDetail, useDashboard, useHomepageStats
-│   ├── lib/                # provider.ts, contract.ts (TxHandle), api.ts, abi.json, utils.ts
-│   └── types/              # Escrow, Milestone, EscrowState, TransactionStatus, Dispute
+│   ├── lib/                # provider.ts, contract.ts (TxHandle, raiseDisputeTx with bond, expireDisputeTx), api.ts, abi.json, utils.ts
+│   └── types/              # Escrow, Milestone, EscrowState, TransactionStatus, Dispute, DISPUTE_BOND_ETH, RESOLUTION_DELAY_SECONDS, MAX_DISPUTE_DURATION_SECONDS
 ```
 
 ## Design System
@@ -96,5 +109,5 @@ Sepolia testnet: `0xD518149F0b1e50E3486C32A295809a65BFF40DE0`
 - OpenZeppelin v5 moved ReentrancyGuard to `utils/ReentrancyGuard.sol`
 - Tests use default import: `import pkg from 'hardhat'; const { ethers } = pkg;`
 - Use `npx hardhat compile` to compile contracts
-- Use `npx hardhat test` to run tests (52 tests)
+- Use `npx hardhat test` to run tests (70 tests)
 - IPFS uploads require `PINATA_JWT` in backend `.env`

@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/layout";
-import { EscrowState, Milestone } from "@/types";
+import { EscrowState, Milestone, DISPUTE_BOND_ETH, RESOLUTION_DELAY_SECONDS, MAX_DISPUTE_DURATION_SECONDS } from "@/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useEscrowDetail } from "@/hooks";
 import { useWalletContext } from "@/components/wallet/WalletProvider";
@@ -16,6 +16,7 @@ import {
   approveMilestoneTx,
   raiseDisputeTx,
   resolveDisputeTx,
+  expireDisputeTx,
   claimMilestoneTx,
   cancelEscrowTx,
   TxHandle,
@@ -258,7 +259,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                             className="flex-1 border border-error/50 text-error font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:bg-error/10 active:scale-[0.98] transition-all disabled:opacity-50"
                           >
                             <span className="material-symbols-outlined text-[20px]">warning</span>
-                            Initiate Dispute
+                            Initiate Dispute ({DISPUTE_BOND_ETH} ETH bond)
                           </button>
                         </div>
                       )}
@@ -282,7 +283,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                             className="flex-1 border border-error/50 text-error font-bold py-3 px-4 rounded-md flex items-center justify-center gap-2 hover:bg-error/10 active:scale-[0.98] transition-all disabled:opacity-50"
                           >
                             <span className="material-symbols-outlined text-[20px]">warning</span>
-                            Initiate Dispute
+                            Initiate Dispute ({DISPUTE_BOND_ETH} ETH bond)
                           </button>
                         </div>
                       )}
@@ -387,8 +388,37 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Resolve Dispute (arbitrator only) */}
           {escrow.state === EscrowState.Disputed && isArbitrator && (
-            <DisputeResolver escrowIdNum={escrowIdNum} pendingAction={pendingAction} onAction={handleAction} />
+            <DisputeResolver escrowIdNum={escrowIdNum} pendingAction={pendingAction} onAction={handleAction} escrow={escrow} />
           )}
+
+          {/* Expire Dispute (anyone, after 30 days) */}
+          {escrow.state === EscrowState.Disputed && !isArbitrator && (() => {
+            const raisedAt = Number(escrow.disputeRaisedAt);
+            const canExpire = raisedAt > 0 && Date.now() / 1000 >= raisedAt + MAX_DISPUTE_DURATION_SECONDS;
+            return canExpire ? (
+              <div className="bg-surface-container rounded-xl p-6 border border-error/20">
+                <h3 className="text-sm font-bold text-white headline-font mb-1 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-error text-[16px]">timer_off</span>
+                  Dispute Expired
+                </h3>
+                <p className="text-xs text-on-surface-variant mb-3">
+                  30 days have passed. The dispute can be expired to release funds to the freelancer.
+                </p>
+                <button
+                  onClick={() => handleAction("Expire Dispute", () => expireDisputeTx(escrowIdNum))}
+                  disabled={!!pendingAction}
+                  className="bg-error/80 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {pendingAction === "Expire Dispute" ? (
+                    <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[16px]">timer_off</span>
+                  )}
+                  {pendingAction === "Expire Dispute" ? "Confirming..." : "Expire Dispute"}
+                </button>
+              </div>
+            ) : null;
+          })()}
 
           {/* Action Error */}
           {actionError && (
@@ -484,8 +514,14 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   );
 }
 
-function DisputeResolver({ escrowIdNum, pendingAction, onAction }: { escrowIdNum: number; pendingAction: string | null; onAction: (label: string, fn: () => Promise<TxHandle>) => Promise<void> }) {
+function DisputeResolver({ escrowIdNum, pendingAction, onAction, escrow }: { escrowIdNum: number; pendingAction: string | null; onAction: (label: string, fn: () => Promise<TxHandle>) => Promise<void>; escrow: any }) {
   const [clientPercent, setClientPercent] = useState(50);
+
+  const raisedAt = Number(escrow.disputeRaisedAt);
+  const canResolve = raisedAt > 0 && Date.now() / 1000 >= raisedAt + RESOLUTION_DELAY_SECONDS;
+  const canExpire = raisedAt > 0 && Date.now() / 1000 >= raisedAt + MAX_DISPUTE_DURATION_SECONDS;
+  const resolutionAvailableAt = raisedAt > 0 ? new Date((raisedAt + RESOLUTION_DELAY_SECONDS) * 1000) : null;
+  const bondEth = escrow.disputeBond || "0";
 
   return (
     <div className="bg-surface-container rounded-xl p-6 border border-secondary/20">
@@ -496,6 +532,17 @@ function DisputeResolver({ escrowIdNum, pendingAction, onAction }: { escrowIdNum
       <p className="text-xs text-on-surface-variant mb-3">
         Set the client&apos;s share. The freelancer receives the remainder.
       </p>
+      {Number(bondEth) > 0 && (
+        <p className="text-xs text-on-surface-variant mb-2">
+          Dispute bond: <span className="text-primary font-bold">{bondEth} ETH</span> (awarded to the winning party)
+        </p>
+      )}
+      {!canResolve && resolutionAvailableAt && (
+        <div className="flex items-center gap-2 mb-3 text-xs text-on-surface-variant bg-primary/5 border border-primary/10 rounded-lg p-3">
+          <span className="material-symbols-outlined text-[16px] text-primary">schedule</span>
+          <span>Evidence period active. Resolution available <span className="text-white font-medium">{resolutionAvailableAt.toLocaleString()}</span>.</span>
+        </div>
+      )}
       <div className="flex items-center gap-4 mb-3">
         <label className="text-xs text-on-surface-variant">Client share:</label>
         <input
@@ -508,18 +555,30 @@ function DisputeResolver({ escrowIdNum, pendingAction, onAction }: { escrowIdNum
         />
         <span className="text-sm font-bold text-white headline-font w-12 text-right">{clientPercent}%</span>
       </div>
-      <button
-        onClick={() => onAction("Resolve", () => resolveDisputeTx(escrowIdNum, clientPercent))}
-        disabled={!!pendingAction}
-        className="bg-secondary text-on-secondary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
-      >
-        {pendingAction === "Resolve" ? (
-          <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
-        ) : (
-          <span className="material-symbols-outlined text-[16px]">gavel</span>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => onAction("Resolve", () => resolveDisputeTx(escrowIdNum, clientPercent))}
+          disabled={!!pendingAction || !canResolve}
+          className="bg-secondary text-on-secondary font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+        >
+          {pendingAction === "Resolve" ? (
+            <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+          ) : (
+            <span className="material-symbols-outlined text-[16px]">gavel</span>
+          )}
+          {pendingAction === "Resolve" ? "Confirming..." : canResolve ? "Resolve" : "Resolve (24h delay)"}
+        </button>
+        {canExpire && (
+          <button
+            onClick={() => onAction("Expire Dispute", () => expireDisputeTx(escrowIdNum))}
+            disabled={!!pendingAction}
+            className="bg-error/80 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[16px]">timer_off</span>
+            {pendingAction === "Expire Dispute" ? "Confirming..." : "Expire Dispute"}
+          </button>
         )}
-        {pendingAction === "Resolve" ? "Confirming..." : "Resolve"}
-      </button>
+      </div>
     </div>
   );
 }

@@ -13,6 +13,14 @@ ChainSteps enables clients and freelancers to create escrow contracts with miles
 - **Backend**: Node.js, Express.js, ethers.js v6
 - **Frontend**: Next.js, TypeScript, Tailwind CSS, MetaMask
 
+## Security Features
+
+- **Required arbitrator** — cannot be the client or freelancer; prevents self-dealing
+- **Dispute bond (0.001 ETH)** — discourages frivolous disputes; awarded to winning party
+- **24-hour evidence period** — arbitrator cannot resolve until 24 hours after dispute is raised
+- **30-day dispute expiry** — if arbitrator never resolves, anyone can trigger auto-release to freelancer
+- **7-day auto-claim** — freelancer can claim milestone if client ghosts after completion
+
 ## Deployed Contract
 
 Sepolia testnet: `0xD518149F0b1e50E3486C32A295809a65BFF40DE0`
@@ -45,7 +53,7 @@ cd frontend && npm install && npm run dev
 
 ```
 ├── contracts/          # Solidity smart contract
-├── test/               # Contract tests (52 tests)
+├── test/               # Contract tests (70 tests)
 ├── scripts/            # Deployment script
 ├── backend/            # Express.js API server (read-only + IPFS upload)
 │   └── src/
