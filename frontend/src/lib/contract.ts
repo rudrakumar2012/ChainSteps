@@ -3,7 +3,7 @@ import { getProvider, getReadOnlyProvider } from "./provider";
 import ABI from "./abi.json";
 import type { Escrow, Milestone, EscrowState } from "@/types";
 
-export const CONTRACT_ADDRESS = "0xD518149F0b1e50E3486C32A295809a65BFF40DE0";
+export const CONTRACT_ADDRESS = "0xb6906A1BCc6A942AaccA6B7Ba80A16F83C946d0E";
 
 export function getReadContract(): ethers.Contract {
   const provider = typeof window !== "undefined" && window.ethereum

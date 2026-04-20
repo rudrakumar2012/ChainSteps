@@ -102,7 +102,7 @@ cd backend && npm install && npm run dev
 ```
 
 ## Deployed Contract
-Sepolia testnet: `0xD518149F0b1e50E3486C32A295809a65BFF40DE0`
+Sepolia testnet: `0xb6906A1BCc6A942AaccA6B7Ba80A16F83C946d0E`
 
 ## Important Notes
 - Hardhat config uses `.cjs` extension (ESM project with CommonJS config)
