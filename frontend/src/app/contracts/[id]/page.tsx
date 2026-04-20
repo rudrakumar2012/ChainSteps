@@ -72,6 +72,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   const isClient = address?.toLowerCase() === escrow.client.toLowerCase();
   const isFreelancer = address?.toLowerCase() === escrow.freelancer.toLowerCase();
   const isArbitrator = escrow.arbitrator && escrow.arbitrator !== ethers.ZeroAddress && address?.toLowerCase() === escrow.arbitrator.toLowerCase();
+  const isDisputed = escrow.state === EscrowState.Disputed;
   const escrowIdNum = Number(escrow.id);
 
   const handleAction = async (label: string, fn: () => Promise<TxHandle>) => {
@@ -240,7 +241,13 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                       </div>
 
                       {/* Action Buttons */}
-                      {isActive && isClient && (
+                      {isActive && isDisputed && (
+                        <div className="flex items-center gap-2 p-4 rounded-lg bg-error/10 border border-error/20 mt-4">
+                          <span className="material-symbols-outlined text-error text-[18px]">gavel</span>
+                          <span className="text-xs text-error font-bold">Dispute active — actions paused until resolved</span>
+                        </div>
+                      )}
+                      {isActive && !isDisputed && isClient && (
                         <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
                           <button
                             onClick={() => handleAction("Approve", () => approveMilestoneTx(escrowIdNum, selectedProvider!))}
@@ -264,7 +271,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                           </button>
                         </div>
                       )}
-                      {isFunded && isFreelancer && !milestones[index].isCompleted && (
+                      {isFunded && !isDisputed && isFreelancer && !milestones[index].isCompleted && (
                         <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-surface-container-lowest/50 mt-4">
                           <button
                             onClick={() => handleAction("Complete", () => completeMilestoneTx(escrowIdNum, selectedProvider!))}
