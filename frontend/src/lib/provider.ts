@@ -6,7 +6,18 @@ let providerSource: EIP1193Provider | null = null;
 
 export function getProvider(eip1193Provider: EIP1193Provider): ethers.BrowserProvider {
   if (!provider || providerSource !== eip1193Provider) {
-    provider = new ethers.BrowserProvider(eip1193Provider);
+    const bp = new ethers.BrowserProvider(eip1193Provider);
+    // Override getFeeData to handle MetaMask not supporting eth_maxPriorityFeePerGas on Sepolia
+    const origGetFeeData = bp.getFeeData.bind(bp);
+    bp.getFeeData = async () => {
+      try {
+        return await origGetFeeData();
+      } catch {
+        const gasPrice = await bp.send("eth_gasPrice", []);
+        return new ethers.FeeData(gasPrice, null, null);
+      }
+    };
+    provider = bp;
     providerSource = eip1193Provider;
   }
   return provider;
