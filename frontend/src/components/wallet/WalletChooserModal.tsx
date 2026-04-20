@@ -28,8 +28,7 @@ export function WalletChooserModal({ open, onClose }: WalletChooserModalProps) {
   const handleSelect = async (detail: EIP6963ProviderDetail) => {
     selectProvider(detail.info.rdns);
     onClose();
-    // Small delay to let state settle before connecting
-    setTimeout(() => connect(), 50);
+    connect(detail.provider);
   };
 
   return (

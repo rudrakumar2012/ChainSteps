@@ -15,7 +15,7 @@ interface WalletContextValue {
   selectedProvider: EIP1193Provider | null;
   selectedDetail: EIP6963ProviderDetail | null;
   selectProvider: (rdns: string) => void;
-  connect: () => Promise<void>;
+  connect: (overrideProvider?: EIP1193Provider) => Promise<void>;
   disconnect: () => void;
   switchToSepolia: () => Promise<void>;
 }

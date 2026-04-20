@@ -137,18 +137,19 @@ export function useWallet() {
     [providers, attachListeners]
   );
 
-  const connect = useCallback(async () => {
-    if (!selectedProvider) {
+  const connect = useCallback(async (overrideProvider?: EIP1193Provider) => {
+    const provider = overrideProvider || selectedProvider;
+    if (!provider) {
       setState((prev) => ({ ...prev, error: "No wallet selected" }));
       return;
     }
 
     setState((prev) => ({ ...prev, isConnecting: true, error: null }));
     try {
-      const accounts = (await selectedProvider.request({
+      const accounts = (await provider.request({
         method: "eth_requestAccounts",
       })) as string[];
-      const chainIdHex = (await selectedProvider.request({
+      const chainIdHex = (await provider.request({
         method: "eth_chainId",
       })) as string;
 
