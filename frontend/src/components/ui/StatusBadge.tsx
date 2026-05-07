@@ -68,9 +68,11 @@ export function StatusBadge({ status, label }: StatusBadgeProps) {
   return (
     <div
       className={`inline-flex items-center gap-2 ${config.bg} ${config.border} px-3 py-1 rounded-full`}
+      role="status"
+      aria-label={label || config.label}
     >
       <span className={`w-2 h-2 rounded-full ${config.dot} ${config.shadow}`} />
-      <span className={`text-[10px] font-bold ${config.text} uppercase tracking-tight`}>
+      <span className={`text-[11px] sm:text-[10px] font-bold ${config.text} uppercase tracking-tight`}>
         {label || config.label}
       </span>
     </div>

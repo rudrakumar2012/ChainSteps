@@ -159,7 +159,7 @@ export default function DisputesPage() {
                 key={option.value}
                 onClick={() => setActiveFilter(option.value)}
                 className={`
-                  px-6 py-2 rounded-lg text-xs font-bold transition-colors
+                  px-4 sm:px-6 py-2.5 sm:py-2 rounded-lg text-xs font-bold transition-colors min-h-[44px] sm:min-h-0
                   ${
                     activeFilter === option.value
                       ? "bg-primary text-on-primary"
@@ -240,7 +240,7 @@ export default function DisputesPage() {
                         )}
                         <button
                           onClick={() => router.push(`/contracts/${dispute.escrowId}`)}
-                          className="px-4 py-1.5 rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
+                          className="px-4 py-2 min-h-[44px] rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
                         >
                           View Contract
                         </button>

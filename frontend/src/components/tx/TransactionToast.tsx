@@ -65,12 +65,13 @@ export function TransactionToast({
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0" role="status" aria-live="polite">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-bold text-white truncate">{tx.label}</p>
             <button
               onClick={onDismiss}
-              className="shrink-0 text-on-surface-variant hover:text-white transition-colors"
+              className="shrink-0 w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"
+              aria-label="Dismiss notification"
             >
               <span className="material-symbols-outlined text-[16px]">close</span>
             </button>

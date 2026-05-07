@@ -77,8 +77,9 @@ export function ConnectButton({
       </div>
       <button
         onClick={disconnect}
-        className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors"
+        className="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors"
         title="Disconnect"
+        aria-label="Disconnect wallet"
       >
         <span className="material-symbols-outlined text-lg">logout</span>
       </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useWalletContext } from "./WalletProvider";
 import type { EIP6963ProviderDetail } from "@/lib/eip6963";
 
@@ -11,6 +11,7 @@ interface WalletChooserModalProps {
 
 export function WalletChooserModal({ open, onClose }: WalletChooserModalProps) {
   const { providers, selectProvider, connect } = useWalletContext();
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -22,6 +23,48 @@ export function WalletChooserModal({ open, onClose }: WalletChooserModalProps) {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  // Focus trap
+  useEffect(() => {
+    if (!open) return;
+
+    const container = modalRef.current;
+    if (!container) return;
+
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    first?.focus();
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -35,8 +78,12 @@ export function WalletChooserModal({ open, onClose }: WalletChooserModalProps) {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Choose a wallet to connect"
     >
       <div
+        ref={modalRef}
         className="glass-card rounded-2xl p-6 w-full max-w-sm mx-4 border border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
@@ -44,7 +91,8 @@ export function WalletChooserModal({ open, onClose }: WalletChooserModalProps) {
           <h3 className="text-lg font-bold text-white headline-font">Connect Wallet</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-white/5 transition-colors"
+            className="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-white/5 transition-colors"
+            aria-label="Close wallet chooser"
           >
             <span className="material-symbols-outlined text-lg">close</span>
           </button>

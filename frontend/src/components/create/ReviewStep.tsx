@@ -30,7 +30,7 @@ export function ReviewStep({ formData, clientAddress }: ReviewStepProps) {
         <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">
           Contract Parties
         </h4>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-surface-container-low rounded-lg p-4">
             <p className="text-[10px] text-on-surface-variant uppercase tracking-wider mb-2">
               Client (You)

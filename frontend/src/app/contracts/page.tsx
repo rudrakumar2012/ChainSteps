@@ -68,7 +68,7 @@ export default function ContractsPage() {
               key={option.value}
               onClick={() => setActiveFilter(option.value)}
               className={`
-                px-6 py-2 rounded-lg text-xs font-bold transition-colors
+                px-4 sm:px-6 py-2.5 sm:py-2 rounded-lg text-xs font-bold transition-colors min-h-[44px] sm:min-h-0
                 ${
                   activeFilter === option.value
                     ? "bg-primary text-on-primary"
@@ -137,23 +137,23 @@ export default function ContractsPage() {
               <h3 className="font-bold headline-font text-lg text-white">Recent Contracts</h3>
             </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto">
+            {/* Table — hidden on mobile, shown on sm+ */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-surface-container-low/30 border-b border-white/5">
-                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Escrow</th>
-                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Role</th>
-                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Total Value</th>
-                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Current Phase</th>
-                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Status</th>
-                    <th className="px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-right">Actions</th>
+                    <th className="px-4 sm:px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Escrow</th>
+                    <th className="px-4 sm:px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Role</th>
+                    <th className="px-4 sm:px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Total Value</th>
+                    <th className="px-4 sm:px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Current Phase</th>
+                    <th className="px-4 sm:px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Status</th>
+                    <th className="px-4 sm:px-8 py-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {filteredEscrows.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-8 py-12 text-center text-on-surface-variant">
+                      <td colSpan={6} className="px-4 sm:px-8 py-12 text-center text-on-surface-variant">
                         No contracts found
                       </td>
                     </tr>
@@ -169,7 +169,7 @@ export default function ContractsPage() {
                           key={escrow.id}
                           className="hover:bg-white/5 transition-colors group"
                         >
-                          <td className="px-8 py-6">
+                          <td className="px-4 sm:px-8 py-6">
                             <div className="flex items-center space-x-4">
                               <div className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center border border-white/10 transition-colors">
                                 <span className={`material-symbols-outlined ${
@@ -188,7 +188,7 @@ export default function ContractsPage() {
                               </div>
                             </div>
                           </td>
-                          <td className="px-8 py-6">
+                          <td className="px-4 sm:px-8 py-6">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
                               role === "freelancer"
                                 ? "bg-tertiary/10 text-tertiary"
@@ -197,10 +197,10 @@ export default function ContractsPage() {
                               {role === "freelancer" ? "Freelancer" : "Client"}
                             </span>
                           </td>
-                          <td className="px-8 py-6">
+                          <td className="px-4 sm:px-8 py-6">
                             <p className="text-sm font-bold text-white headline-font">{escrow.totalAmount} ETH</p>
                           </td>
-                          <td className="px-8 py-6">
+                          <td className="px-4 sm:px-8 py-6">
                             <div className="flex items-center space-x-2">
                               <span className="text-xs font-medium text-on-surface">{getPhaseLabel(escrow)}</span>
                               <span className={`w-1.5 h-1.5 rounded-full ${
@@ -212,13 +212,13 @@ export default function ContractsPage() {
                               }`} />
                             </div>
                           </td>
-                          <td className="px-8 py-6">
+                          <td className="px-4 sm:px-8 py-6">
                             <StatusBadge status={status} />
                           </td>
-                          <td className="px-8 py-6 text-right">
+                          <td className="px-4 sm:px-8 py-6 text-right">
                             <button
                               onClick={() => router.push(`/contracts/${escrow.id}`)}
-                              className="px-4 py-1.5 rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
+                              className="px-4 py-2 min-h-[44px] rounded-lg bg-surface-container-high text-xs font-bold text-white border border-white/5 hover:border-primary/50 transition-all hover:bg-surface-container-highest active:scale-95"
                             >
                               Details
                             </button>
@@ -229,6 +229,60 @@ export default function ContractsPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            {/* Card view — visible on mobile only */}
+            <div className="sm:hidden space-y-3 p-4">
+              {filteredEscrows.length === 0 ? (
+                <div className="py-12 text-center text-on-surface-variant">
+                  No contracts found
+                </div>
+              ) : (
+                filteredEscrows.map((escrow) => {
+                  const status = getEscrowStatus(escrow);
+                  const isClient = address && escrow.client.toLowerCase() === address.toLowerCase();
+                  const isArbitrator = escrow.arbitrator && escrow.arbitrator !== "0x0000000000000000000000000000000000000000" && address && escrow.arbitrator.toLowerCase() === address.toLowerCase();
+                  const role = isClient ? "client" : isArbitrator ? "arbitrator" : "freelancer";
+
+                  return (
+                    <button
+                      key={escrow.id}
+                      onClick={() => router.push(`/contracts/${escrow.id}`)}
+                      className="w-full text-left glass-card rounded-xl p-4 border border-white/5 hover:border-primary/30 transition-all active:scale-[0.98]"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center border border-white/10">
+                            <span className={`material-symbols-outlined ${
+                              status === "active" ? "text-primary" : status === "completed" ? "text-secondary" : "text-error"
+                            }`}>
+                              description
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-white headline-font">Escrow #{escrow.id}</p>
+                            <p className="text-[11px] text-on-surface-variant font-medium">
+                              {escrow.client.slice(0, 6)}...{escrow.client.slice(-4)} → {escrow.freelancer.slice(0, 6)}...{escrow.freelancer.slice(-4)}
+                            </p>
+                          </div>
+                        </div>
+                        <StatusBadge status={status} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
+                            role === "freelancer" ? "bg-tertiary/10 text-tertiary" : "bg-primary/10 text-primary"
+                          }`}>
+                            {role === "freelancer" ? "Freelancer" : "Client"}
+                          </span>
+                          <span className="text-xs text-on-surface">{getPhaseLabel(escrow)}</span>
+                        </div>
+                        <p className="text-sm font-bold text-white headline-font">{escrow.totalAmount} ETH</p>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
             </div>
 
             {/* Pagination */}

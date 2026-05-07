@@ -59,8 +59,8 @@ export function MilestonesStep({ formData, onUpdate, errors }: MilestonesStepPro
 
       {/* Add New Milestone Form */}
       <div className="bg-surface-container-low rounded-xl p-5 border border-white/10">
-        <div className="flex items-end gap-4">
-          <div className="flex-1">
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-0">
             <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
               Description
             </label>
@@ -72,7 +72,7 @@ export function MilestonesStep({ formData, onUpdate, errors }: MilestonesStepPro
               className="w-full bg-surface-container border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
-          <div className="w-32">
+          <div className="w-28 sm:w-32">
             <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">
               Amount (ETH)
             </label>
@@ -138,7 +138,8 @@ export function MilestonesStep({ formData, onUpdate, errors }: MilestonesStepPro
               </div>
               <button
                 onClick={() => removeMilestone(index)}
-                className="w-8 h-8 rounded-lg hover:bg-error/10 flex items-center justify-center text-on-surface-variant hover:text-error transition-colors"
+                className="w-11 h-11 rounded-lg hover:bg-error/10 flex items-center justify-center text-on-surface-variant hover:text-error transition-colors"
+                aria-label={`Remove milestone ${index + 1}`}
               >
                 <span className="material-symbols-outlined text-sm">delete</span>
               </button>

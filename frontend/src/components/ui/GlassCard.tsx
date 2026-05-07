@@ -20,7 +20,7 @@ export function GlassCard({
   return (
     <div
       className={`
-        glass-card rounded-2xl p-6
+        glass-card rounded-2xl p-4 sm:p-6
         transition-all duration-300 ease-in-out
         ${glowClasses[glowIntensity]}
         ${className}

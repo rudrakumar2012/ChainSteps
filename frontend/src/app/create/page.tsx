@@ -219,6 +219,33 @@ export default function CreateEscrowPage() {
 
       {/* Multi-Step Layout */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+        {/* Mobile Step Indicator */}
+        <div className="md:hidden flex items-center justify-center gap-2 mb-4">
+          {STEPS.map((step, index) => {
+            const isCompleted = currentIndex > index;
+            const isActive = currentIndex === index;
+            return (
+              <div key={step.key} className="flex items-center gap-2">
+                <div
+                  className={`
+                    w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold
+                    ${isCompleted ? "bg-primary text-on-primary" : isActive ? "border-2 border-primary text-primary shadow-[0_0_10px_rgba(76,215,246,0.3)]" : "border-2 border-surface-container-highest text-on-surface-variant"}
+                  `}
+                >
+                  {isCompleted ? (
+                    <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                  ) : (
+                    String(index + 1)
+                  )}
+                </div>
+                {index < STEPS.length - 1 && (
+                  <div className={`w-6 h-[2px] ${isCompleted ? "bg-primary" : "bg-surface-container-highest"}`} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
         {/* Left Column: Vertical Stepper Track */}
         <div className="hidden md:block md:col-span-3">
           <div className="md:sticky md:top-28 space-y-12">

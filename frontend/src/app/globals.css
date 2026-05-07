@@ -125,6 +125,60 @@ body {
   background: var(--color-outline);
 }
 
+/* Touch-friendly range slider */
+input[type="range"] {
+  height: 44px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 0 8px rgba(76, 215, 246, 0.4);
+  margin-top: -12px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: var(--color-surface-container-highest);
+  border-radius: 2px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 0 8px rgba(76, 215, 246, 0.4);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: var(--color-surface-container-highest);
+  border-radius: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .cube-face,
+  .orbital-node {
+    animation: none !important;
+  }
+}
+
 /* 3D transform utilities */
 .preserve-3d {
   transform-style: preserve-3d;

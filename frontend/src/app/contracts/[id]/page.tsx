@@ -335,7 +335,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                 <button
                   onClick={() => setConfirmCancel(true)}
                   disabled={!!pendingAction}
-                  className="text-on-surface-variant hover:text-error text-xs font-bold transition-colors disabled:opacity-50"
+                  className="min-h-[44px] px-3 text-on-surface-variant hover:text-error text-xs font-bold transition-colors disabled:opacity-50"
                 >
                   Cancel Escrow
                 </button>
@@ -345,7 +345,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                   <button
                     onClick={() => { setConfirmCancel(false); handleAction("Cancel", () => cancelEscrowTx(escrowIdNum, selectedProvider!)); }}
                     disabled={!!pendingAction}
-                    className="text-xs font-bold text-error bg-error/10 px-3 py-1 rounded hover:bg-error/20 transition-colors disabled:opacity-50"
+                    className="min-h-[44px] px-4 py-2 text-xs font-bold text-error bg-error/10 rounded hover:bg-error/20 transition-colors disabled:opacity-50"
                   >
                     Confirm Cancel
                   </button>

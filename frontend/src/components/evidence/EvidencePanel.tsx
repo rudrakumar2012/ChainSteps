@@ -109,6 +109,9 @@ export function EvidencePanel({
           <div
             onClick={() => fileInputRef.current?.click()}
             className="text-center cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
           >
             <span className="material-symbols-outlined text-3xl text-on-surface-variant mb-2">
               cloud_upload
@@ -147,7 +150,8 @@ export function EvidencePanel({
                   </div>
                   <button
                     onClick={() => removeFile(index)}
-                    className="w-8 h-8 rounded-lg hover:bg-error/10 flex items-center justify-center text-on-surface-variant hover:text-error transition-colors"
+                    className="w-11 h-11 rounded-lg hover:bg-error/10 flex items-center justify-center text-on-surface-variant hover:text-error transition-colors"
+                    aria-label={`Remove ${file.name}`}
                   >
                     <span className="material-symbols-outlined text-sm">close</span>
                   </button>
@@ -213,7 +217,8 @@ export function EvidencePanel({
                 href={`https://ipfs.io/ipfs/${file.ipfsHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg hover:bg-primary/10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
+                className="w-11 h-11 rounded-lg hover:bg-primary/10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
+                aria-label={`Open ${file.name} on IPFS`}
               >
                 <span className="material-symbols-outlined text-sm">open_in_new</span>
               </a>
