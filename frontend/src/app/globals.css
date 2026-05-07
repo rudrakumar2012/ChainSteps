@@ -108,8 +108,8 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -204,6 +204,7 @@ input[type="range"]::-moz-range-track {
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 15px rgba(76, 215, 246, 0.15); }
   50% { box-shadow: 0 0 30px rgba(76, 215, 246, 0.3); }
+  will-change: box-shadow;
 }
 
 .cube-face {

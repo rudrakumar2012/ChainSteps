@@ -9,7 +9,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-surface">
       <HomeHeader />
-      <main>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-on-primary focus:rounded-lg focus:text-sm focus:font-bold">Skip to content</a>
+      <main id="main-content">
         <HomepageStatsProvider>
           <Hero />
           <FeatureGrid />
@@ -26,7 +27,7 @@ export default function HomePage() {
                   <h1 className="text-xl font-bold tracking-tighter text-primary headline-font">
                     ChainSteps
                   </h1>
-                  <p className="text-[10px] text-on-surface-variant uppercase tracking-[0.2em]">
+                  <p className="text-[11px] text-on-surface-variant uppercase tracking-[0.2em]">
                     Decentralized Escrow
                   </p>
                 </div>

@@ -75,7 +75,7 @@ export function MilestoneTimeline({
             {/* Timeline connector (vertical line) */}
             {index < milestones.length - 1 && (
               <div
-                className={`absolute left-4 top-14 w-0.5 h-12 ${getConnectorColor(
+                className={`absolute left-4 top-14 w-0.5 h-16 ${getConnectorColor(
                   state,
                   getMilestoneState(milestones[index + 1])
                 )}`}
@@ -111,7 +111,7 @@ export function MilestoneTimeline({
                         Milestone {index + 1}
                       </span>
                       {isCurrentMilestone && (
-                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded">
+                        <span className="text-[11px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded">
                           Current
                         </span>
                       )}

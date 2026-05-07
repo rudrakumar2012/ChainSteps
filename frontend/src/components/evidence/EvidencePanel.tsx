@@ -150,7 +150,7 @@ export function EvidencePanel({
                       description
                     </span>
                     <div>
-                      <p className="text-sm text-white truncate max-w-[200px]">
+                      <p className="text-sm text-white truncate max-w-[160px] sm:max-w-[200px]">
                         {file.name}
                       </p>
                       <p className="text-xs text-on-surface-variant">

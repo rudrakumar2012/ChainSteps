@@ -124,7 +124,7 @@ export function BlockchainCube() {
         return (
           <motion.div
             key={i}
-            className="absolute w-3 h-3 rounded-full bg-primary/60 orbital-node"
+            className="absolute w-4 h-4 rounded-full bg-primary/60 orbital-node"
             animate={{ x: path.x, y: path.y }}
             transition={{
               duration: node.duration,
