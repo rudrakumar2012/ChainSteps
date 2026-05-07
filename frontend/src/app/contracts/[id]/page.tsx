@@ -46,10 +46,11 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   if (loading) {
     return (
       <AppShell>
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-20" role="status" aria-label="Loading contract details">
           <span className="material-symbols-outlined text-primary text-3xl animate-spin">
             progress_activity
           </span>
+          <span className="sr-only">Loading...</span>
         </div>
       </AppShell>
     );

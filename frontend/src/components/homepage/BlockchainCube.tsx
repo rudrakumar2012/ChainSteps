@@ -35,7 +35,7 @@ function orbitPath(radius: number, startAngle: number) {
 
 export function BlockchainCube() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [isHovering, setIsHovering] = useState(false);
 
   const tiltX = useMotionValue(0);
@@ -76,6 +76,9 @@ export function BlockchainCube() {
   }, [isHovering, isMobile, tiltX, tiltY]);
 
   const cubeSize = isMobile ? 40 : 60;
+
+  // Avoid hydration mismatch: render nothing until client determines isMobile
+  if (isMobile === null) return <div className="relative w-full h-full" ref={containerRef} />;
 
   return (
     <div

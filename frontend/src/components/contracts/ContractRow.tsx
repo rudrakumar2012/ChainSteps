@@ -27,7 +27,7 @@ export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) 
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick?.(); } }}
-      className="glass-card p-5 hover:scale-[1.01] cursor-pointer transition-all duration-200"
+      className="glass-card p-5 cursor-pointer transition-all duration-200 hover:scale-[1.01] @media-[hover:hover]:hover:scale-[1.01]"
     >
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
@@ -50,7 +50,7 @@ export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) 
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
         <div className="bg-surface-container-low rounded-lg p-3">
-          <p className="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">
+          <p className="text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">
             Total Value
           </p>
           <p className="text-sm font-bold text-primary headline-font">
@@ -58,7 +58,7 @@ export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) 
           </p>
         </div>
         <div className="bg-surface-container-low rounded-lg p-3">
-          <p className="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">
+          <p className="text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">
             Milestones
           </p>
           <p className="text-sm font-bold text-white">
@@ -66,7 +66,7 @@ export function ContractRow({ escrow, currentRole, onClick }: ContractRowProps) 
           </p>
         </div>
         <div className="bg-surface-container-low rounded-lg p-3">
-          <p className="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">
+          <p className="text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">
             Your Role
           </p>
           {currentRole ? (

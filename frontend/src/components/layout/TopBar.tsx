@@ -17,7 +17,7 @@ export function TopBar() {
       <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         <button
           onClick={toggle}
-          className="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors"
+          className="lg:hidden w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors"
         >
           <span className="material-symbols-outlined">menu</span>
         </button>
@@ -35,7 +35,7 @@ export function TopBar() {
 
       {/* Actions */}
       <div className="flex items-center gap-3 sm:gap-6 shrink-0">
-        <div className="hidden sm:flex items-center gap-4 text-on-surface-variant">
+        <div className="flex items-center gap-4 text-on-surface-variant">
           <div className="relative cursor-pointer hover:text-primary transition-colors text-on-surface-variant">
             <span className="material-symbols-outlined">notifications</span>
             {pendingCount > 0 && (

@@ -314,7 +314,7 @@ export default function CreateEscrowPage() {
         <div className="md:col-span-9 space-y-8">
           {/* Step Content */}
           {currentStep === "parties" && (
-            <div className="glass-card rounded-xl p-8 border border-white/5 shadow-xl relative overflow-hidden">
+            <div className="glass-card rounded-xl p-4 sm:p-8 border border-white/5 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-10">
                 <span className="material-symbols-outlined text-8xl">account_balance_wallet</span>
               </div>
@@ -327,7 +327,7 @@ export default function CreateEscrowPage() {
           )}
 
           {currentStep === "milestones" && (
-            <div className="glass-card rounded-xl p-8 border border-white/5 shadow-xl">
+            <div className="glass-card rounded-xl p-4 sm:p-8 border border-white/5 shadow-xl">
               <div className="flex justify-between items-center mb-10">
                 <h2 className="headline-font text-xl font-bold text-white flex items-center">
                   <span className="w-8 h-[2px] bg-primary mr-3" />
@@ -339,7 +339,7 @@ export default function CreateEscrowPage() {
           )}
 
           {currentStep === "review" && (
-            <div className="glass-card rounded-xl p-8 border border-white/5 shadow-xl">
+            <div className="glass-card rounded-xl p-4 sm:p-8 border border-white/5 shadow-xl">
               <h2 className="headline-font text-xl font-bold text-white mb-8 flex items-center">
                 <span className="w-8 h-[2px] bg-primary mr-3" />
                 Review &amp; Deploy

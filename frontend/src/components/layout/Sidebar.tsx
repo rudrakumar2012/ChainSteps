@@ -27,16 +27,16 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   };
 
   return (
-    <aside className="h-screen w-64 bg-surface-container-low shadow-2xl shadow-cyan-900/20 flex flex-col border-r border-white/5">
-      {/* Logo */}
-      <div className="px-6 mb-10 mt-6">
+    <aside className="h-dvh w-64 bg-surface-container-low shadow-2xl shadow-cyan-900/20 flex flex-col border-r border-white/5">
+      {/* Close button (mobile only) + Logo */}
+      <div className="px-6 mb-10 mt-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img src="/logo.svg" alt="ChainSteps" className="w-10 h-10" />
           <div>
             <h1 className="text-xl font-bold tracking-tighter text-primary headline-font">
               ChainSteps
             </h1>
-            <p className="text-[10px] text-on-surface-variant uppercase tracking-[0.2em]">
+            <p className="text-[11px] text-on-surface-variant uppercase tracking-[0.2em]">
               Decentralized Escrow
             </p>
           </div>
@@ -71,19 +71,19 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       <div className="px-4 pt-6 mt-auto">
         <div className="p-3 rounded-xl bg-surface-container border border-white/5 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">Network</span>
-            <span className="text-[10px] text-secondary font-medium">Sepolia</span>
+            <span className="text-[11px] text-on-surface-variant uppercase tracking-wider">Network</span>
+            <span className="text-[11px] text-secondary font-medium">Sepolia</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">Contract</span>
-            <span className="text-[10px] text-on-surface-variant font-mono">0xb690...0E</span>
+            <span className="text-[11px] text-on-surface-variant uppercase tracking-wider">Contract</span>
+            <span className="text-[11px] text-on-surface-variant font-mono">0xb690...0E</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">Chain</span>
-            <span className="text-[10px] text-on-surface-variant font-mono">11155111</span>
+            <span className="text-[11px] text-on-surface-variant uppercase tracking-wider">Chain</span>
+            <span className="text-[11px] text-on-surface-variant font-mono">11155111</span>
           </div>
         </div>
-        <p className="text-[9px] text-on-surface-variant/50 text-center mt-3 mb-2">
+        <p className="text-[11px] text-on-surface-variant/50 text-center mt-3 mb-2">
           v1.0.0 &middot; ChainSteps
         </p>
       </div>

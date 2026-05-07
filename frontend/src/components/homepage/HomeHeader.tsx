@@ -38,7 +38,7 @@ export function HomeHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-md border-b border-white/5">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-md border-b border-white/5">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -96,7 +96,7 @@ export function HomeHeader() {
                     key={item.href}
                     href={item.href}
                     className={`
-                      flex items-center gap-1 px-3 py-1.5 rounded-lg whitespace-nowrap
+                      flex items-center gap-1 px-3 py-2.5 rounded-lg whitespace-nowrap min-h-[44px]
                       text-xs tracking-tight transition-colors
                       ${
                         isActive(item.href)

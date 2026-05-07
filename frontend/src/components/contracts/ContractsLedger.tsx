@@ -108,6 +108,9 @@ export function ContractsLedger({
                   <tr
                     key={escrow.id}
                     onClick={() => onContractClick?.(escrow)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onContractClick?.(escrow); } }}
+                    role="button"
+                    tabIndex={0}
                     className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors"
                   >
                     <td className="py-4">

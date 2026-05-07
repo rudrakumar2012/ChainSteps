@@ -28,6 +28,7 @@ export function EvidencePanel({
   const [showUpload, setShowUpload] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [sizeError, setSizeError] = useState<string | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -50,6 +51,7 @@ export function EvidencePanel({
 
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
+    setIsDragOver(false);
     const files = Array.from(event.dataTransfer.files);
     const valid = filterFiles(files);
     setSelectedFiles((prev) => [...prev, ...valid]);
@@ -57,6 +59,11 @@ export function EvidencePanel({
 
   const handleDragOver = (event: React.DragEvent) => {
     event.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
   };
 
   const removeFile = (index: number) => {
@@ -96,7 +103,10 @@ export function EvidencePanel({
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className="mb-4 p-6 border-2 border-dashed border-white/10 rounded-xl bg-surface-container-low hover:border-primary/30 transition-colors"
+          onDragLeave={handleDragLeave}
+          className={`mb-4 p-6 border-2 border-dashed rounded-xl bg-surface-container-low transition-colors ${
+            isDragOver ? "border-primary/60 bg-primary/5" : "border-white/10 hover:border-primary/30"
+          }`}
         >
           <input
             ref={fileInputRef}

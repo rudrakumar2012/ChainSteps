@@ -28,7 +28,7 @@ export function Button({
     secondary:
       "bg-secondary text-on-secondary hover:brightness-110",
     ghost:
-      "text-on-surface hover:bg-surface-variant/50",
+      "text-on-surface hover:bg-surface-container/50",
     danger:
       "border border-error/50 text-error hover:bg-error/10",
   };

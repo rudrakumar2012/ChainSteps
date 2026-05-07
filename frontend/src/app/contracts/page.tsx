@@ -83,10 +83,11 @@ export default function ContractsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-20" role="status" aria-label="Loading contracts">
           <span className="material-symbols-outlined text-primary text-3xl animate-spin">
             progress_activity
           </span>
+          <span className="sr-only">Loading...</span>
         </div>
       ) : error ? (
         <div className="glass-card p-8 text-center">
